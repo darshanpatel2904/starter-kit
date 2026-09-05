@@ -1,38 +1,37 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # Dependencies
 node_modules
 .pnp
 .pnp.js
 
-# Local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Agent & Skill Customizations
+.agents/
+.gemini/
+skills-lock.json
 
-# Testing
-coverage
+# Environment Files
+.env*
+!.env.example
+!.env*.example
 
-# Turbo
-.turbo
-
-# Vercel
-.vercel
-
-# Build Outputs
+# Build & Framework Outputs
 .next/
 out/
 build
 dist
+.turbo
+.vercel
+*.tsbuildinfo
+next-env.d.ts
 
+# Testing & Coverage
+coverage
 
-# Debug
+# Logs & Debug
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Misc
+# OS & Misc
 .DS_Store
 *.pem

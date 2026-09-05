@@ -1,102 +1,156 @@
-import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
-import styles from "./page.module.css";
+"use client";
 
-type Props = Omit<ImageProps, "src"> & {
-  srcLight: string;
-  srcDark: string;
-};
+import Link from "next/link";
+import { Card, Typography, Button, Space, Row, Col, Tag } from "antd";
+import {
+  SafetyCertificateOutlined,
+  UserOutlined,
+  BgColorsOutlined,
+  ThunderboltOutlined,
+  ArrowRightOutlined,
+} from "@ant-design/icons";
+import { authClient } from "@/lib/auth-client";
 
-const ThemeImage = (props: Props) => {
-  const { srcLight, srcDark, ...rest } = props;
-
-  return (
-    <>
-      <Image {...rest} src={srcLight} className="imgLight" />
-      <Image {...rest} src={srcDark} className="imgDark" />
-    </>
-  );
-};
+const { Title, Paragraph, Text } = Typography;
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <ThemeImage
-          className={styles.logo}
-          srcLight="turborepo-dark.svg"
-          srcDark="turborepo-light.svg"
-          alt="Turborepo logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>apps/web/app/page.tsx</code>
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new/clone?demo-description=Learn+to+implement+a+monorepo+with+a+two+Next.js+sites+that+has+installed+three+local+packages.&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F4K8ZISWAzJ8X1504ca0zmC%2F0b21a1c6246add355e55816278ef54bc%2FBasic.png&demo-title=Monorepo+with+Turborepo&demo-url=https%3A%2F%2Fexamples-basic-web.vercel.sh%2F&from=templates&project-name=Monorepo+with+Turborepo&repository-name=monorepo-turborepo&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fturborepo%2Ftree%2Fmain%2Fexamples%2Fbasic&root-directory=apps%2Fdocs&skippable-integrations=1&teamSlug=vercel&utm_source=create-turbo"
-            target="_blank"
-            rel="noopener noreferrer"
+  return (
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 20px", width: "100%" }}>
+      {/* Hero Section */}
+      <div style={{ textAlign: "center", padding: "40px 0 60px" }}>
+        <Tag color="blue" style={{ padding: "4px 12px", borderRadius: 12, fontSize: 14, marginBottom: 16 }}>
+          Next.js 16 + Ant Design + Better Auth
+        </Tag>
+        <Title level={1} style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-1px", marginBottom: 16 }}>
+          Authentication Made Elegant & Secure
+        </Title>
+        <Paragraph type="secondary" style={{ fontSize: 18, maxWidth: 640, margin: "0 auto 32px" }}>
+          Full-featured authentication architecture with Ant Design SSR integration, dynamic theme switching, email/password login, social providers, and active session control.
+        </Paragraph>
+
+        <Space size="middle">
+          {user ? (
+            <Link href="/profile">
+              <Button type="primary" size="large" icon={<UserOutlined />}>
+                Go to Profile Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button type="primary" size="large" icon={<ArrowRightOutlined />}>
+                  Get Started (Sign In)
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="large">Create Account</Button>
+              </Link>
+            </>
+          )}
+        </Space>
+      </div>
+
+      {/* Feature Grid */}
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={8}>
+          <Card
+            variant="borderless"
+            style={{
+              height: "100%",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)",
+              borderRadius: 12,
+            }}
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://turborepo.dev/docs?utm_source"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 10,
+                background: "rgba(22, 119, 255, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#1677ff",
+                fontSize: 24,
+                marginBottom: 16,
+              }}
+            >
+              <SafetyCertificateOutlined />
+            </div>
+            <Title level={4}>Better Auth Engine</Title>
+            <Text type="secondary">
+              Email/Password, Password Reset flows, Social OAuth (Google/GitHub), and active session tracking using Better Auth.
+            </Text>
+          </Card>
+        </Col>
+
+        <Col xs={24} md={8}>
+          <Card
+            variant="borderless"
+            style={{
+              height: "100%",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)",
+              borderRadius: 12,
+            }}
           >
-            Read our docs
-          </a>
-        </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com/templates?search=turborepo&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://turborepo.dev?utm_source=create-turbo"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to turborepo.dev →
-        </a>
-      </footer>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 10,
+                background: "rgba(82, 196, 26, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#52c41a",
+                fontSize: 24,
+                marginBottom: 16,
+              }}
+            >
+              <ThunderboltOutlined />
+            </div>
+            <Title level={4}>Antd Next.js SSR</Title>
+            <Text type="secondary">
+              Zero FOUC (flash of unstyled content) server-side rendering setup with @ant-design/nextjs-registry in App Router.
+            </Text>
+          </Card>
+        </Col>
+
+        <Col xs={24} md={8}>
+          <Card
+            variant="borderless"
+            style={{
+              height: "100%",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)",
+              borderRadius: 12,
+            }}
+          >
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 10,
+                background: "rgba(250, 173, 20, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#faad14",
+                fontSize: 24,
+                marginBottom: 16,
+              }}
+            >
+              <BgColorsOutlined />
+            </div>
+            <Title level={4}>Dynamic Theme Switcher</Title>
+            <Text type="secondary">
+              Seamlessly toggle between Light and Dark mode using Ant Design ConfigProvider algorithms and local storage persistence.
+            </Text>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 }
