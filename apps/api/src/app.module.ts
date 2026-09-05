@@ -10,9 +10,10 @@ import {
   appConfig,
   databaseConfig,
   authConfig,
+  storageConfig,
 } from './lib/config/index.js';
 import { AuthModule } from './auth/auth.module.js';
-
+import { StorageModule } from './storage/storage.module.js';
 
 @Module({
   imports: [
@@ -29,14 +30,16 @@ import { AuthModule } from './auth/auth.module.js';
         }
         return value;
       },
-      load: [appConfig, databaseConfig, authConfig],
+      load: [appConfig, databaseConfig, authConfig, storageConfig],
     }),
     DatabaseModule,
     UsersModule,
     AuthModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule { }
+
 

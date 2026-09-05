@@ -13,6 +13,7 @@ import {
     SafetyCertificateOutlined,
     HomeOutlined,
     DashboardOutlined,
+    CloudUploadOutlined,
 } from "@ant-design/icons";
 import { useTheme } from "../providers/theme-provider";
 import { authClient } from "../lib/auth-client";
@@ -66,6 +67,11 @@ export function Navbar() {
             key: "dashboard",
             icon: <DashboardOutlined />,
             label: <Link href="/dashboard">Dashboard</Link>,
+        },
+        {
+            key: "upload",
+            icon: <CloudUploadOutlined />,
+            label: <Link href="/upload">S3 Uploads</Link>,
         },
         { type: "divider" as const },
         {
@@ -126,6 +132,11 @@ export function Navbar() {
                             Dashboard
                         </Button>
                     </Link>
+                    <Link href="/upload">
+                        <Button type={pathname.startsWith("/upload") ? "primary" : "text"} icon={<CloudUploadOutlined />}>
+                            S3 Upload
+                        </Button>
+                    </Link>
                 </Space>
             </Space>
 
@@ -135,7 +146,7 @@ export function Navbar() {
                     shape="circle"
                     icon={mounted && isDarkMode ? <SunOutlined style={{ color: "#faad14" }} /> : <MoonOutlined />}
                     onClick={toggleTheme}
-                    title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                    title={mounted && isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                 />
 
                 <div>

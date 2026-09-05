@@ -14,4 +14,18 @@ export const envValidationSchema = Joi.object({
   APP_URL: Joi.string().uri().default('http://localhost:3000'),
   GOOGLE_CLIENT_ID: Joi.string().allow('').optional(),
   GOOGLE_CLIENT_SECRET: Joi.string().allow('').optional(),
+  AWS_REGION: Joi.string().required().default('us-east-1'),
+  AWS_S3_BUCKET: Joi.string().required().messages({
+    'any.required': 'AWS_S3_BUCKET is required in apps/api/.env',
+  }),
+  AWS_ACCESS_KEY_ID: Joi.string().required().messages({
+    'any.required': 'AWS_ACCESS_KEY_ID is required in apps/api/.env',
+  }),
+  AWS_SECRET_ACCESS_KEY: Joi.string().required().messages({
+    'any.required': 'AWS_SECRET_ACCESS_KEY is required in apps/api/.env',
+  }),
+  AWS_S3_ENDPOINT: Joi.string().allow('').optional(),
+  AWS_S3_FORCE_PATH_STYLE: Joi.boolean().default(false),
 });
+
+

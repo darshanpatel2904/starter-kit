@@ -40,6 +40,7 @@ export async function fetcher<T = unknown>(
       : `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
 
     const res = await fetch(url, {
+      credentials: "include",
       ...fetchOptions,
       headers: customHeaders,
       cache,

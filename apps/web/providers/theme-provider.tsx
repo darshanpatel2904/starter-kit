@@ -61,12 +61,16 @@ function ThemeBodySync({ children }: { children: React.ReactNode }) {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const mounted = useIsMounted();
-    const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-        if (typeof window === "undefined") return false;
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+    useEffect(() => {
         const storedTheme = localStorage.getItem("theme");
-        if (storedTheme) return storedTheme === "dark";
-        return typeof window.matchMedia === "function" && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    });
+        if (storedTheme) {
+            setIsDarkMode(storedTheme === "dark");
+        } else if (typeof window.matchMedia === "function" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setIsDarkMode(true);
+        }
+    }, []);
 
 
 

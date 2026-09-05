@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { ConfigService } from '@nestjs/config';
@@ -6,6 +7,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bodyParser: false,
   });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port', 3001);
   const appUrl = configService.get<string>('app.appUrl', 'http://localhost:3000');
@@ -18,3 +28,4 @@ async function bootstrap() {
   await app.listen(port);
 }
 bootstrap();
+

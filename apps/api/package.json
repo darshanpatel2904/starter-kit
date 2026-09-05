@@ -28,6 +28,8 @@
     "generate:middleware": "nest g middleware"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1126.0",
+    "@aws-sdk/s3-request-presigner": "^3.1126.0",
     "@better-auth/passkey": "^1.7.2",
     "@nestjs/common": "^12.0.1",
     "@nestjs/config": "^12.0.0",
@@ -35,8 +37,11 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^12.0.1",
     "@repo/db": "workspace:*",
+    "@repo/types": "workspace:*",
     "@thallesp/nestjs-better-auth": "^2.7.0",
     "better-auth": "^1.7.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
     "dotenv": "^16.6.1",
     "joi": "^18.2.8",
     "reflect-metadata": "^0.2.2",

@@ -3,6 +3,7 @@ import { pgTable, text, boolean, timestamp } from 'drizzle-orm/pg-core';
 import { sessions } from './sessions';
 import { accounts } from './accounts';
 import { passkeys } from './passkeys';
+import { files } from './files';
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -21,6 +22,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(sessions),
   accounts: many(accounts),
   passkeys: many(passkeys),
+  files: many(files),
 }));
 
 export type User = typeof users.$inferSelect;
