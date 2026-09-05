@@ -40,6 +40,4 @@ import { StorageModule } from './storage/storage.module.js';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
-
-
+export class AppModule {}

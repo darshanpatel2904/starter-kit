@@ -1,23 +1,23 @@
-export type SocialProvider = "google" | "github";
+export type SocialProvider = 'google' | 'github';
 
 export interface LoginFormValues {
-    email: string;
-    password: string;
-    remember?: boolean;
+  email: string;
+  password: string;
+  remember?: boolean;
 }
 
 export interface SignUpFormValues {
-    name: string;
-    email: string;
-    password: string;
-    confirmPassword?: string;
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
 }
 
 export interface ForgotPasswordFormValues {
-    email: string;
+  email: string;
 }
 
 export interface ResetPasswordFormValues {
-    newPassword: string;
-    confirmPassword?: string;
+  newPassword: string;
+  confirmPassword?: string;
 }

@@ -1,7 +1,4 @@
-import {
-  Session,
-  type UserSession,
-} from '@thallesp/nestjs-better-auth';
+import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
 import { Controller, Get } from '@nestjs/common';
 import {
   ApiTags,

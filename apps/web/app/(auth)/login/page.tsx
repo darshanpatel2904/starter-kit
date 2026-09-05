@@ -1,18 +1,28 @@
-"use client";
+'use client';
 
-import { useState, useTransition } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Card, Form, Input, Button, Checkbox, Divider, Typography, Space, App as AntdApp } from "antd";
+import { useState, useTransition } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  Divider,
+  Typography,
+  Space,
+  App as AntdApp,
+} from 'antd';
 import {
   MailOutlined,
   LockOutlined,
   GoogleOutlined,
   GithubOutlined,
   LoginOutlined,
-} from "@ant-design/icons";
-import type { LoginFormValues, SocialProvider } from "@repo/types";
-import { authClient } from "@/lib/auth-client";
+} from '@ant-design/icons';
+import type { LoginFormValues, SocialProvider } from '@repo/types';
+import { authClient } from '@/lib/auth-client';
 
 const { Title, Text } = Typography;
 
@@ -32,13 +42,13 @@ export default function LoginPage() {
         });
 
         if (res?.error) {
-          message.error(res.error.message || "Invalid email or password");
+          message.error(res.error.message || 'Invalid email or password');
         } else {
-          message.success("Logged in successfully!");
-          router.push("/dashboard");
+          message.success('Logged in successfully!');
+          router.push('/dashboard');
         }
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred";
+        const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred';
         message.error(errorMsg);
       }
     });
@@ -50,7 +60,7 @@ export default function LoginPage() {
       try {
         await authClient.signIn.social({
           provider,
-          callbackURL: "/dashboard",
+          callbackURL: '/dashboard',
         });
       } catch {
         message.error(`Failed to sign in with ${provider}`);
@@ -59,29 +69,28 @@ export default function LoginPage() {
     });
   };
 
-
   return (
     <Card
       variant="borderless"
       style={{
-        boxShadow: "0 12px 32px rgba(0, 0, 0, 0.08)",
+        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.08)',
         borderRadius: 16,
       }}
     >
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
+      <div style={{ textAlign: 'center', marginBottom: 24 }}>
         <Title level={2} style={{ marginBottom: 4 }}>
           Welcome Back
         </Title>
         <Text type="secondary">Sign in to your StarterKit account</Text>
       </div>
 
-      <Space orientation="vertical" style={{ width: "100%" }} size="middle">
+      <Space orientation="vertical" style={{ width: '100%' }} size="middle">
         <Button
           block
           size="large"
           icon={<GoogleOutlined />}
-          loading={isPending && socialLoading === "google"}
-          onClick={() => handleSocialSignIn("google")}
+          loading={isPending && socialLoading === 'google'}
+          onClick={() => handleSocialSignIn('google')}
         >
           Continue with Google
         </Button>
@@ -89,14 +98,14 @@ export default function LoginPage() {
           block
           size="large"
           icon={<GithubOutlined />}
-          loading={isPending && socialLoading === "github"}
-          onClick={() => handleSocialSignIn("github")}
+          loading={isPending && socialLoading === 'github'}
+          onClick={() => handleSocialSignIn('github')}
         >
           Continue with GitHub
         </Button>
       </Space>
 
-      <Divider style={{ margin: "20px 0" }}>
+      <Divider style={{ margin: '20px 0' }}>
         <Text type="secondary" style={{ fontSize: 13 }}>
           OR
         </Text>
@@ -114,31 +123,23 @@ export default function LoginPage() {
           name="email"
           label="Email Address"
           rules={[
-            { required: true, message: "Please enter your email!" },
-            { type: "email", message: "Please enter a valid email address!" },
+            { required: true, message: 'Please enter your email!' },
+            { type: 'email', message: 'Please enter a valid email address!' },
           ]}
         >
-          <Input
-            prefix={<MailOutlined />}
-            placeholder="name@example.com"
-            size="large"
-          />
+          <Input prefix={<MailOutlined />} placeholder="name@example.com" size="large" />
         </Form.Item>
 
         <Form.Item
           name="password"
           label="Password"
-          rules={[{ required: true, message: "Please enter your password!" }]}
+          rules={[{ required: true, message: 'Please enter your password!' }]}
         >
-          <Input.Password
-            prefix={<LockOutlined />}
-            placeholder="••••••••"
-            size="large"
-          />
+          <Input.Password prefix={<LockOutlined />} placeholder="••••••••" size="large" />
         </Form.Item>
 
         <Form.Item>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Form.Item name="remember" valuePropName="checked" noStyle>
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
@@ -162,9 +163,9 @@ export default function LoginPage() {
         </Form.Item>
       </Form>
 
-      <div style={{ textAlign: "center", marginTop: 16 }}>
+      <div style={{ textAlign: 'center', marginTop: 16 }}>
         <Text type="secondary">
-          Don&apos;t have an account?{" "}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" style={{ fontWeight: 500 }}>
             Sign up
           </Link>

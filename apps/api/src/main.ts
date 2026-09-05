@@ -19,7 +19,10 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port', 3001);
-  const appUrl = configService.get<string>('app.appUrl', 'http://localhost:3000');
+  const appUrl = configService.get<string>(
+    'app.appUrl',
+    'http://localhost:3000',
+  );
 
   app.enableCors({
     origin: appUrl,
@@ -29,7 +32,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Starter Kit API')
-    .setDescription('RESTful API services for file storage, user management, and authentication.')
+    .setDescription(
+      'RESTful API services for file storage, user management, and authentication.',
+    )
     .setVersion('1.0')
     .addCookieAuth('better-auth.session_token', {
       type: 'apiKey',
@@ -55,4 +60,3 @@ async function bootstrap() {
   await app.listen(port);
 }
 bootstrap();
-

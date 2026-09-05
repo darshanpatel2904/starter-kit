@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useTransition } from "react";
+import { useTransition } from 'react';
 import {
   Card,
   Tabs,
@@ -13,16 +13,16 @@ import {
   Tag,
   Space,
   App as AntdApp,
-} from "antd";
+} from 'antd';
 import {
   UserOutlined,
   LockOutlined,
   SafetyCertificateOutlined,
   EditOutlined,
   KeyOutlined,
-} from "@ant-design/icons";
-import type { ProfileFormValues, PasswordFormValues } from "@repo/types";
-import { authClient } from "@/lib/auth-client";
+} from '@ant-design/icons';
+import type { ProfileFormValues, PasswordFormValues } from '@repo/types';
+import { authClient } from '@/lib/auth-client';
 
 const { Title, Text } = Typography;
 
@@ -43,12 +43,12 @@ export default function ProfilePage() {
           name: values.name,
         });
         if (res?.error) {
-          message.error(res.error.message || "Failed to update profile");
+          message.error(res.error.message || 'Failed to update profile');
         } else {
-          message.success("Profile updated successfully!");
+          message.success('Profile updated successfully!');
         }
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : "An error occurred";
+        const errorMsg = err instanceof Error ? err.message : 'An error occurred';
         message.error(errorMsg);
       }
     });
@@ -64,17 +64,17 @@ export default function ProfilePage() {
         });
 
         if (res?.error) {
-          message.error(res.error.message || "Failed to change password");
+          message.error(res.error.message || 'Failed to change password');
         } else {
-          message.success("Password changed successfully!");
+          message.success('Password changed successfully!');
           passwordForm.resetFields();
         }
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : "An error occurred";
+        const errorMsg = err instanceof Error ? err.message : 'An error occurred';
         message.error(errorMsg);
       }
     });
-  }
+  };
 
   if (sessionLoading || !session?.user) return null;
 
@@ -82,7 +82,7 @@ export default function ProfilePage() {
 
   const tabItems = [
     {
-      key: "profile",
+      key: 'profile',
       label: (
         <span>
           <UserOutlined /> General Information
@@ -97,7 +97,7 @@ export default function ProfilePage() {
               <Tag color="blue">Active</Tag>
             </Descriptions.Item>
             <Descriptions.Item label="Created At">
-              {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+              {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
             </Descriptions.Item>
           </Descriptions>
 
@@ -111,7 +111,7 @@ export default function ProfilePage() {
               <Form.Item
                 name="name"
                 label="Display Name"
-                rules={[{ required: true, message: "Please enter your display name" }]}
+                rules={[{ required: true, message: 'Please enter your display name' }]}
               >
                 <Input prefix={<UserOutlined />} placeholder="Your Name" size="large" />
               </Form.Item>
@@ -130,7 +130,7 @@ export default function ProfilePage() {
       ),
     },
     {
-      key: "security",
+      key: 'security',
       label: (
         <span>
           <LockOutlined /> Security & Password
@@ -143,7 +143,7 @@ export default function ProfilePage() {
               <Form.Item
                 name="currentPassword"
                 label="Current Password"
-                rules={[{ required: true, message: "Please enter current password" }]}
+                rules={[{ required: true, message: 'Please enter current password' }]}
               >
                 <Input.Password prefix={<LockOutlined />} size="large" />
               </Form.Item>
@@ -152,8 +152,8 @@ export default function ProfilePage() {
                 name="newPassword"
                 label="New Password"
                 rules={[
-                  { required: true, message: "Please enter new password" },
-                  { min: 8, message: "Password must be at least 8 characters" },
+                  { required: true, message: 'Please enter new password' },
+                  { min: 8, message: 'Password must be at least 8 characters' },
                 ]}
               >
                 <Input.Password prefix={<KeyOutlined />} size="large" />
@@ -175,31 +175,35 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div style={{ maxWidth: 1000, margin: "40px auto", padding: "0 20px", width: "100%" }}>
+    <div style={{ maxWidth: 1000, margin: '40px auto', padding: '0 20px', width: '100%' }}>
       <Card
         variant="borderless"
         style={{
-          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.06)",
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.06)',
           borderRadius: 16,
           marginBottom: 24,
         }}
       >
-        <Space size="large" align="center" style={{ width: "100%", justifyContent: "space-between" }}>
+        <Space
+          size="large"
+          align="center"
+          style={{ width: '100%', justifyContent: 'space-between' }}
+        >
           <Space size="large" align="center">
             <Avatar
               size={72}
               src={user.image}
               icon={!user.image && <UserOutlined />}
-              style={{ backgroundColor: "#1677ff", fontSize: 32 }}
+              style={{ backgroundColor: '#1677ff', fontSize: 32 }}
             />
             <div>
               <Title level={3} style={{ margin: 0 }}>
-                {user.name || "User Profile"}
+                {user.name || 'User Profile'}
               </Title>
               <Text type="secondary">{user.email}</Text>
             </div>
           </Space>
-          <Tag color="green" style={{ padding: "4px 12px", borderRadius: 12, fontSize: 13 }}>
+          <Tag color="green" style={{ padding: '4px 12px', borderRadius: 12, fontSize: 13 }}>
             Verified User
           </Tag>
         </Space>
@@ -208,7 +212,7 @@ export default function ProfilePage() {
       <Card
         variant="borderless"
         style={{
-          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.06)",
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.06)',
           borderRadius: 16,
         }}
       >

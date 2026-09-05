@@ -34,8 +34,15 @@ export class StorageController {
   constructor(private readonly storageService: StorageService) {}
 
   @Post('upload/initiate')
-  @ApiOperation({ summary: 'Initiate file upload (S3 single presigned PUT or multipart upload)' })
-  @ApiResponse({ status: 201, description: 'Upload initiated successfully with upload parameters and presigned URL.' })
+  @ApiOperation({
+    summary:
+      'Initiate file upload (S3 single presigned PUT or multipart upload)',
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Upload initiated successfully with upload parameters and presigned URL.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async initiateUpload(
     @Body() dto: InitiateUploadDto,
@@ -45,8 +52,13 @@ export class StorageController {
   }
 
   @Post('upload/presign-part')
-  @ApiOperation({ summary: 'Generate presigned URL for a specific chunk in multipart upload' })
-  @ApiResponse({ status: 201, description: 'Presigned URL generated successfully for chunk.' })
+  @ApiOperation({
+    summary: 'Generate presigned URL for a specific chunk in multipart upload',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Presigned URL generated successfully for chunk.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async getPresignedPartUrl(
     @Body() dto: PresignPartDto,
@@ -57,7 +69,10 @@ export class StorageController {
 
   @Post('upload/complete')
   @ApiOperation({ summary: 'Finalize file upload and save database record' })
-  @ApiResponse({ status: 201, description: 'Upload finalized and file record completed.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Upload finalized and file record completed.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async completeUpload(
     @Body() dto: CompleteUploadDto,
@@ -78,7 +93,9 @@ export class StorageController {
   }
 
   @Get('upload/parts')
-  @ApiOperation({ summary: 'List already uploaded parts for an in-progress multipart upload' })
+  @ApiOperation({
+    summary: 'List already uploaded parts for an in-progress multipart upload',
+  })
   @ApiQuery({ name: 'fileId', required: true, type: String })
   @ApiQuery({ name: 'uploadId', required: true, type: String })
   @ApiQuery({ name: 'key', required: true, type: String })
@@ -90,7 +107,12 @@ export class StorageController {
     @Query('key') key: string,
     @Session() session: UserSession,
   ) {
-    return this.storageService.listUploadedParts(fileId, uploadId, key, session.user.id);
+    return this.storageService.listUploadedParts(
+      fileId,
+      uploadId,
+      key,
+      session.user.id,
+    );
   }
 
   @Get('files')
@@ -107,7 +129,10 @@ export class StorageController {
   @Get('files/:id/download')
   @ApiOperation({ summary: 'Get temporary presigned download URL for a file' })
   @ApiParam({ name: 'id', description: 'File UUID', type: String })
-  @ApiResponse({ status: 200, description: 'Presigned download URL generated.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Presigned download URL generated.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 44, description: 'File not found.' })
   async getDownloadUrl(

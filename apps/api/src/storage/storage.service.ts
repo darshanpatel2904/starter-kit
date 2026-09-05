@@ -1,4 +1,10 @@
-import { Injectable, Logger, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   S3Client,
@@ -29,7 +35,7 @@ import type {
 } from '@repo/types';
 
 const MULTIPART_THRESHOLD = 10 * 1024 * 1024; // 10MB
-const DEFAULT_CHUNK_SIZE = 5 * 1024 * 1024;   // 5MB
+const DEFAULT_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
 @Injectable()
 export class StorageService {
@@ -42,10 +48,17 @@ export class StorageService {
     private readonly storageRepository: StorageRepository,
   ) {
     const region = this.configService.getOrThrow<string>('storage.region');
-    const accessKeyId = this.configService.getOrThrow<string>('storage.accessKeyId');
-    const secretAccessKey = this.configService.getOrThrow<string>('storage.secretAccessKey');
+    const accessKeyId = this.configService.getOrThrow<string>(
+      'storage.accessKeyId',
+    );
+    const secretAccessKey = this.configService.getOrThrow<string>(
+      'storage.secretAccessKey',
+    );
     const endpoint = this.configService.get<string>('storage.endpoint');
-    const forcePathStyle = this.configService.get<boolean>('storage.forcePathStyle', false);
+    const forcePathStyle = this.configService.get<boolean>(
+      'storage.forcePathStyle',
+      false,
+    );
 
     this.bucket = this.configService.getOrThrow<string>('storage.bucket');
 
@@ -85,7 +98,9 @@ export class StorageService {
         ContentType: dto.mimeType,
       });
 
-      const uploadUrl = await getSignedUrl(this.s3Client, command, { expiresIn: 900 });
+      const uploadUrl = await getSignedUrl(this.s3Client, command, {
+        expiresIn: 900,
+      });
 
       // Create record in database via repository
       await this.storageRepository.createFileRecord({
@@ -161,7 +176,9 @@ export class StorageService {
       PartNumber: dto.partNumber,
     });
 
-    const presignedUrl = await getSignedUrl(this.s3Client, command, { expiresIn: 900 });
+    const presignedUrl = await getSignedUrl(this.s3Client, command, {
+      expiresIn: 900,
+    });
 
     return {
       presignedUrl,
@@ -176,7 +193,9 @@ export class StorageService {
     await this.verifyFileOwnership(dto.fileId, uploaderId);
 
     if (dto.uploadId && dto.parts && dto.parts.length > 0) {
-      const sortedParts = [...dto.parts].sort((a, b) => a.PartNumber - b.PartNumber);
+      const sortedParts = [...dto.parts].sort(
+        (a, b) => a.PartNumber - b.PartNumber,
+      );
 
       const command = new CompleteMultipartUploadCommand({
         Bucket: this.bucket,
@@ -191,7 +210,10 @@ export class StorageService {
     }
 
     // Mark COMPLETED in DB via repository
-    return await this.storageRepository.updateFileStatus(dto.fileId, 'COMPLETED');
+    return await this.storageRepository.updateFileStatus(
+      dto.fileId,
+      'COMPLETED',
+    );
   }
 
   /**
@@ -209,7 +231,9 @@ export class StorageService {
         });
         await this.s3Client.send(command);
       } catch (error) {
-        this.logger.warn(`Failed to abort S3 upload for ${dto.uploadId}: ${error}`);
+        this.logger.warn(
+          `Failed to abort S3 upload for ${dto.uploadId}: ${error}`,
+        );
       }
     }
 
@@ -219,7 +243,12 @@ export class StorageService {
   /**
    * List parts already uploaded to S3 (for pause/resume upload state recovery).
    */
-  async listUploadedParts(fileId: string, uploadId: string, key: string, uploaderId: string) {
+  async listUploadedParts(
+    fileId: string,
+    uploadId: string,
+    key: string,
+    uploaderId: string,
+  ) {
     await this.verifyFileOwnership(fileId, uploaderId);
 
     try {
@@ -249,14 +278,19 @@ export class StorageService {
       ResponseContentDisposition: `attachment; filename="${encodeURIComponent(fileRecord.name)}"`,
     });
 
-    const downloadUrl = await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+    const downloadUrl = await getSignedUrl(this.s3Client, command, {
+      expiresIn: 3600,
+    });
     return { downloadUrl, file: fileRecord };
   }
 
   /**
    * List files for current user with pagination.
    */
-  async listFiles(uploaderId: string, query: ListFilesQueryDto): Promise<PaginatedFilesResponse> {
+  async listFiles(
+    uploaderId: string,
+    query: ListFilesQueryDto,
+  ): Promise<PaginatedFilesResponse> {
     return await this.storageRepository.listFilesByUploader(uploaderId, {
       page: query.page || 1,
       limit: query.limit || 10,

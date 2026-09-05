@@ -1,8 +1,8 @@
-import { createAuthClient } from "better-auth/react";
-import { passkeyClient } from "@better-auth/passkey/client";
+import { createAuthClient } from 'better-auth/react';
+import { passkeyClient } from '@better-auth/passkey/client';
 
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   plugins: [passkeyClient()],
 });
 

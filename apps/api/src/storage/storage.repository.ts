@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { db, files, eq, and, desc, sql, type FileRecord, type NewFileRecord } from '@repo/db';
+import {
+  db,
+  files,
+  eq,
+  desc,
+  sql,
+  type FileRecord,
+  type NewFileRecord,
+} from '@repo/db';
 
 @Injectable()
 export class StorageRepository {
@@ -11,8 +19,10 @@ export class StorageRepository {
     return inserted;
   }
 
-
-  async updateFileStatus(fileId: string, status: 'COMPLETED' | 'ABORTED'): Promise<FileRecord | undefined> {
+  async updateFileStatus(
+    fileId: string,
+    status: 'COMPLETED' | 'ABORTED',
+  ): Promise<FileRecord | undefined> {
     const [updated] = await db
       .update(files)
       .set({ status, updatedAt: new Date() })
@@ -32,7 +42,12 @@ export class StorageRepository {
   async listFilesByUploader(
     uploaderId: string,
     pagination: { page: number; limit: number },
-  ): Promise<{ data: FileRecord[]; total: number; page: number; limit: number }> {
+  ): Promise<{
+    data: FileRecord[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const offset = (pagination.page - 1) * pagination.limit;
 
     const data = await db

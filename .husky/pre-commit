@@ -1,0 +1,4 @@
+npx lint-staged
+pnpm check-types
+pnpm lint
+

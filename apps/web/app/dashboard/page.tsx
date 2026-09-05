@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useTransition, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Card, Typography, Button, Space, Descriptions, Tag, Avatar, App as AntdApp } from "antd";
+import { useTransition, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Card, Typography, Button, Space, Descriptions, Tag, Avatar, App as AntdApp } from 'antd';
 import {
   UserOutlined,
   LogoutOutlined,
   SafetyCertificateOutlined,
   DashboardOutlined,
   SettingOutlined,
-} from "@ant-design/icons";
-import { authClient } from "@/lib/auth-client";
+} from '@ant-design/icons';
+import { authClient } from '@/lib/auth-client';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -23,7 +23,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!sessionLoading && !session?.user) {
-      router.replace("/login");
+      router.replace('/login');
     }
   }, [sessionLoading, session, router]);
 
@@ -31,10 +31,10 @@ export default function DashboardPage() {
     startSignOutTransition(async () => {
       try {
         await authClient.signOut();
-        message.success("Logged out successfully");
-        router.push("/login");
+        message.success('Logged out successfully');
+        router.push('/login');
       } catch {
-        message.error("Failed to sign out");
+        message.error('Failed to sign out');
       }
     });
   };
@@ -44,23 +44,31 @@ export default function DashboardPage() {
   const user = session.user;
 
   return (
-    <div style={{ maxWidth: 960, margin: "40px auto", padding: "0 20px", width: "100%" }}>
+    <div style={{ maxWidth: 960, margin: '40px auto', padding: '0 20px', width: '100%' }}>
       {/* Header / Banner */}
       <Card
         variant="borderless"
         style={{
-          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.06)",
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.06)',
           borderRadius: 16,
           marginBottom: 24,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 16,
+          }}
+        >
           <Space size="middle" align="center">
             <Avatar
               size={64}
               src={user.image}
               icon={!user.image && <UserOutlined />}
-              style={{ backgroundColor: "#1677ff", fontSize: 28 }}
+              style={{ backgroundColor: '#1677ff', fontSize: 28 }}
             />
             <div>
               <Space align="center" size="small">
@@ -71,7 +79,7 @@ export default function DashboardPage() {
                   Protected Area
                 </Tag>
               </Space>
-              <Paragraph type="secondary" style={{ margin: "4px 0 0" }}>
+              <Paragraph type="secondary" style={{ margin: '4px 0 0' }}>
                 Welcome back, <Text strong>{user.name || user.email}</Text>!
               </Paragraph>
             </div>
@@ -79,16 +87,9 @@ export default function DashboardPage() {
 
           <Space size="small">
             <Link href="/profile">
-              <Button icon={<SettingOutlined />}>
-                Profile Settings
-              </Button>
+              <Button icon={<SettingOutlined />}>Profile Settings</Button>
             </Link>
-            <Button
-              danger
-              icon={<LogoutOutlined />}
-              loading={isSigningOut}
-              onClick={handleSignOut}
-            >
+            <Button danger icon={<LogoutOutlined />} loading={isSigningOut} onClick={handleSignOut}>
               Sign Out
             </Button>
           </Space>
@@ -100,23 +101,19 @@ export default function DashboardPage() {
         variant="borderless"
         title={
           <Space align="center">
-            <UserOutlined style={{ color: "#1677ff" }} />
+            <UserOutlined style={{ color: '#1677ff' }} />
             <span>User Session Information</span>
           </Space>
         }
         style={{
-          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.06)",
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.06)',
           borderRadius: 16,
           marginBottom: 24,
         }}
       >
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Full Name">
-            {user.name || "N/A"}
-          </Descriptions.Item>
-          <Descriptions.Item label="Email Address">
-            {user.email}
-          </Descriptions.Item>
+          <Descriptions.Item label="Full Name">{user.name || 'N/A'}</Descriptions.Item>
+          <Descriptions.Item label="Email Address">{user.email}</Descriptions.Item>
           <Descriptions.Item label="User ID">
             <Text code>{user.id}</Text>
           </Descriptions.Item>
@@ -131,18 +128,19 @@ export default function DashboardPage() {
         variant="borderless"
         title={
           <Space align="center">
-            <SafetyCertificateOutlined style={{ color: "#52c41a" }} />
+            <SafetyCertificateOutlined style={{ color: '#52c41a' }} />
             <span>Protected Content</span>
           </Space>
         }
         style={{
-          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.06)",
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.06)',
           borderRadius: 16,
         }}
       >
         <Paragraph style={{ fontSize: 16, marginBottom: 0 }}>
-          This dashboard is rendered with <Text strong>Client Session Authorization</Text> and protected by <Text strong>Better Auth</Text>.
-          Only authenticated users with an active session can view this page.
+          This dashboard is rendered with <Text strong>Client Session Authorization</Text> and
+          protected by <Text strong>Better Auth</Text>. Only authenticated users with an active
+          session can view this page.
         </Paragraph>
       </Card>
     </div>

@@ -8,4 +8,3 @@ export const storageConfig = registerAs('storage', () => ({
   endpoint: process.env.AWS_S3_ENDPOINT || undefined,
   forcePathStyle: process.env.AWS_S3_FORCE_PATH_STYLE === 'true',
 }));
-

@@ -2,7 +2,10 @@ import { IsString, IsNumber, IsNotEmpty, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PresignPartDto {
-  @ApiProperty({ description: 'File UUID', example: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d' })
+  @ApiProperty({
+    description: 'File UUID',
+    example: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+  })
   @IsString()
   @IsNotEmpty()
   fileId!: string;
@@ -12,7 +15,10 @@ export class PresignPartDto {
   @IsNotEmpty()
   uploadId!: string;
 
-  @ApiProperty({ description: 'S3 Object Key', example: 'uploads/user_123/file.pdf' })
+  @ApiProperty({
+    description: 'S3 Object Key',
+    example: 'uploads/user_123/file.pdf',
+  })
   @IsString()
   @IsNotEmpty()
   key!: string;

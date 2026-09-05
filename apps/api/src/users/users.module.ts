@@ -4,4 +4,4 @@ import { UsersController } from './users.controller.js';
 @Module({
   controllers: [UsersController],
 })
-export class UsersModule { }
+export class UsersModule {}

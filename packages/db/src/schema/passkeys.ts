@@ -3,25 +3,25 @@ import { users } from './users';
 import { relations } from 'drizzle-orm';
 
 export const passkeys = pgTable(
-  "passkeys",
+  'passkeys',
   {
-    id: text("id").primaryKey(),
-    name: text("name"),
-    publicKey: text("public_key").notNull(),
-    userId: text("user_id")
+    id: text('id').primaryKey(),
+    name: text('name'),
+    publicKey: text('public_key').notNull(),
+    userId: text('user_id')
       .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    credentialID: text("credential_id").notNull(),
-    counter: integer("counter").notNull(),
-    deviceType: text("device_type").notNull(),
-    backedUp: boolean("backed_up").notNull(),
-    transports: text("transports"),
-    createdAt: timestamp("created_at"),
-    aaguid: text("aaguid"),
+      .references(() => users.id, { onDelete: 'cascade' }),
+    credentialID: text('credential_id').notNull(),
+    counter: integer('counter').notNull(),
+    deviceType: text('device_type').notNull(),
+    backedUp: boolean('backed_up').notNull(),
+    transports: text('transports'),
+    createdAt: timestamp('created_at'),
+    aaguid: text('aaguid'),
   },
   (table) => [
-    index("passkeys_userId_idx").on(table.userId),
-    index("passkeys_credentialID_idx").on(table.credentialID),
+    index('passkeys_userId_idx').on(table.userId),
+    index('passkeys_credentialID_idx').on(table.credentialID),
   ],
 );
 

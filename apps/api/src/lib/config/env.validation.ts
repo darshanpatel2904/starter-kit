@@ -27,5 +27,3 @@ export const envValidationSchema = Joi.object({
   AWS_S3_ENDPOINT: Joi.string().allow('').optional(),
   AWS_S3_FORCE_PATH_STYLE: Joi.boolean().default(false),
 });
-
-

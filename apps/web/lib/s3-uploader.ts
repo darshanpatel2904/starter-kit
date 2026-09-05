@@ -91,7 +91,15 @@ export async function uploadFileToS3(options: CustomUploadOptions): Promise<File
       throw new Error('Failed to initiate upload with backend server.');
     }
 
-    const { fileId, key, isMultipart, uploadId, uploadUrl, chunkSize = 5 * 1024 * 1024, totalParts = 1 } = initiateRes;
+    const {
+      fileId,
+      key,
+      isMultipart,
+      uploadId,
+      uploadUrl,
+      chunkSize = 5 * 1024 * 1024,
+      totalParts = 1,
+    } = initiateRes;
 
     // --- CASE 1: Single presigned PUT (Files <= 10MB) ---
     if (!isMultipart && uploadUrl) {
@@ -173,14 +181,19 @@ export async function uploadFileToS3(options: CustomUploadOptions): Promise<File
           signal,
           onProgress: (loaded) => {
             activePartProgress[task.partNumber] = loaded;
-            const currentTotalUploaded = Object.values(activePartProgress).reduce((acc, cur) => acc + cur, 0);
+            const currentTotalUploaded = Object.values(activePartProgress).reduce(
+              (acc, cur) => acc + cur,
+              0,
+            );
             const percent = Math.min(99, Math.round((currentTotalUploaded / file.size) * 100));
             onProgress?.(percent);
           },
         });
 
         if (!etag) {
-          throw new Error(`Missing ETag header for part #${task.partNumber}. Check S3 CORS settings.`);
+          throw new Error(
+            `Missing ETag header for part #${task.partNumber}. Check S3 CORS settings.`,
+          );
         }
 
         completedParts.push({ ETag: etag, PartNumber: task.partNumber });
@@ -189,7 +202,9 @@ export async function uploadFileToS3(options: CustomUploadOptions): Promise<File
     };
 
     // Run worker pool
-    const workers = Array.from({ length: Math.min(DEFAULT_CONCURRENCY, partTasks.length) }, () => uploadWorker());
+    const workers = Array.from({ length: Math.min(DEFAULT_CONCURRENCY, partTasks.length) }, () =>
+      uploadWorker(),
+    );
     await Promise.all(workers);
 
     // Sort parts by PartNumber

@@ -4,17 +4,16 @@ import { AuthModule as BetterAuthModule } from '@thallesp/nestjs-better-auth';
 import { AuthService, createBetterAuth } from './auth.service.js';
 
 @Module({
-    imports: [
-        BetterAuthModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => ({
-                auth: createBetterAuth(configService),
-            }),
-        }),
-    ],
-    providers: [AuthService],
-    exports: [AuthService, BetterAuthModule],
+  imports: [
+    BetterAuthModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        auth: createBetterAuth(configService),
+      }),
+    }),
+  ],
+  providers: [AuthService],
+  exports: [AuthService, BetterAuthModule],
 })
-export class AuthModule { }
-
+export class AuthModule {}

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Upload, Card, Typography, Progress, Button, Space, Alert, Tag, Flex } from "antd";
+import React, { useState } from 'react';
+import { Upload, Card, Typography, Progress, Button, Space, Alert, Tag, Flex } from 'antd';
 import {
   InboxOutlined,
   CloudUploadOutlined,
   CloseCircleOutlined,
   CheckCircleOutlined,
   FileOutlined,
-} from "@ant-design/icons";
-import { uploadFileToS3 } from "../lib/s3-uploader";
-import type { FileRecord } from "@repo/types";
+} from '@ant-design/icons';
+import { uploadFileToS3 } from '../lib/s3-uploader';
+import type { FileRecord } from '@repo/types';
 
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
@@ -22,7 +22,7 @@ interface FileUploaderProps {
 interface ActiveUploadState {
   jobId: string;
   file: File;
-  status: "idle" | "uploading" | "paused" | "completed" | "error";
+  status: 'idle' | 'uploading' | 'paused' | 'completed' | 'error';
   progress: number;
   controller?: AbortController;
   errorMessage?: string;
@@ -34,11 +34,11 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
   const [activeUploads, setActiveUploads] = useState<ActiveUploadState[]>([]);
 
   const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return "0 B";
+    if (bytes === 0) return '0 B';
     const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const startUpload = async (file: File) => {
@@ -49,7 +49,7 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
     const initialState: ActiveUploadState = {
       jobId,
       file,
-      status: "uploading",
+      status: 'uploading',
       progress: 0,
       controller,
       isMultipart,
@@ -64,41 +64,37 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
         onProgress: (percent) => {
           setActiveUploads((prev) =>
             prev.map((item) =>
-              item.jobId === jobId
-                ? { ...item, progress: percent, status: "uploading" }
-                : item
-            )
+              item.jobId === jobId ? { ...item, progress: percent, status: 'uploading' } : item,
+            ),
           );
         },
         onSuccess: (res) => {
           setActiveUploads((prev) =>
             prev.map((item) =>
-              item.jobId === jobId
-                ? { ...item, status: "completed", result: res }
-                : item
-            )
+              item.jobId === jobId ? { ...item, status: 'completed', result: res } : item,
+            ),
           );
           onUploadSuccess?.(res);
         },
         onError: (err) => {
           const message = controller.signal.aborted
-            ? "Upload cancelled by user"
-            : err.message || "Upload failed";
+            ? 'Upload cancelled by user'
+            : err.message || 'Upload failed';
 
           setActiveUploads((prev) =>
             prev.map((item) =>
               item.jobId === jobId
                 ? {
-                  ...item,
-                  status: controller.signal.aborted ? "paused" : "error",
-                  errorMessage: message,
-                }
-                : item
-            )
+                    ...item,
+                    status: controller.signal.aborted ? 'paused' : 'error',
+                    errorMessage: message,
+                  }
+                : item,
+            ),
           );
         },
       });
-    } catch (err) {
+    } catch {
       // Top level errors are delivered via onError callback, state updated accordingly
     }
   };
@@ -114,19 +110,20 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
   return (
     <Card
       style={{
-        width: "100%",
+        width: '100%',
         borderRadius: 12,
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
       }}
     >
-      <Space orientation="vertical" size="large" style={{ width: "100%" }}>
+      <Space orientation="vertical" size="large" style={{ width: '100%' }}>
         <div>
           <Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
-            <CloudUploadOutlined style={{ marginRight: 8, color: "#1677ff" }} />
+            <CloudUploadOutlined style={{ marginRight: 8, color: '#1677ff' }} />
             AWS S3 Multipart File Upload
           </Title>
           <Text type="secondary">
-            Upload files of any size. Files larger than 10MB are automatically processed using S3 Parallel Multipart Upload chunks.
+            Upload files of any size. Files larger than 10MB are automatically processed using S3
+            Parallel Multipart Upload chunks.
           </Text>
         </div>
 
@@ -138,25 +135,26 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
             return false; // Prevent default form upload
           }}
           style={{
-            padding: "24px",
-            background: "var(--ant-color-bg-container, #fafafa)",
+            padding: '24px',
+            background: 'var(--ant-color-bg-container, #fafafa)',
             borderRadius: 8,
-            border: "2px dashed #1677ff",
+            border: '2px dashed #1677ff',
           }}
         >
           <p className="ant-upload-drag-icon">
-            <InboxOutlined style={{ fontSize: 48, color: "#1677ff" }} />
+            <InboxOutlined style={{ fontSize: 48, color: '#1677ff' }} />
           </p>
           <p className="ant-upload-text" style={{ fontSize: 16, fontWeight: 600 }}>
             Click or drag file to this area to upload
           </p>
-          <p className="ant-upload-hint" style={{ color: "#8c8c8c" }}>
-            Supports single presigned PUT for files ≤10MB, and 3-worker parallel S3 Multipart upload for files &gt;10MB.
+          <p className="ant-upload-hint" style={{ color: '#8c8c8c' }}>
+            Supports single presigned PUT for files ≤10MB, and 3-worker parallel S3 Multipart upload
+            for files &gt;10MB.
           </p>
         </Dragger>
 
         {activeUploads.length > 0 && (
-          <Space orientation="vertical" style={{ width: "100%" }} size="middle">
+          <Space orientation="vertical" style={{ width: '100%' }} size="middle">
             <Text strong>Active Upload Jobs</Text>
             {activeUploads.map((item) => {
               const { jobId, file, status, progress, isMultipart, errorMessage } = item;
@@ -167,12 +165,12 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                   size="small"
                   style={{
                     borderRadius: 8,
-                    border: status === "error" ? "1px solid #ff4d4f" : undefined,
+                    border: status === 'error' ? '1px solid #ff4d4f' : undefined,
                   }}
                 >
                   <Flex justify="space-between" align="center" style={{ marginBottom: 8 }}>
                     <Space align="center">
-                      <FileOutlined style={{ fontSize: 20, color: "#1677ff" }} />
+                      <FileOutlined style={{ fontSize: 20, color: '#1677ff' }} />
                       <div>
                         <Text strong style={{ fontSize: 14 }}>
                           {file.name}
@@ -195,7 +193,7 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                     </Space>
 
                     <Space align="center">
-                      {status === "uploading" && (
+                      {status === 'uploading' && (
                         <Button
                           type="text"
                           danger
@@ -205,12 +203,12 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                           Cancel
                         </Button>
                       )}
-                      {status === "completed" && (
+                      {status === 'completed' && (
                         <Tag color="success" icon={<CheckCircleOutlined />}>
                           Completed
                         </Tag>
                       )}
-                      {status === "error" && (
+                      {status === 'error' && (
                         <Tag color="error" icon={<CloseCircleOutlined />}>
                           Failed
                         </Tag>
@@ -218,23 +216,23 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                     </Space>
                   </Flex>
 
-                  {status === "uploading" && (
+                  {status === 'uploading' && (
                     <>
                       <Progress
                         percent={progress}
                         status="active"
                         strokeColor={{
-                          "0%": "#108ee9",
-                          "100%": "#87d068",
+                          '0%': '#108ee9',
+                          '100%': '#87d068',
                         }}
                       />
                     </>
                   )}
 
-                  {status === "error" && (
+                  {status === 'error' && (
                     <Alert
                       title="Upload Failed"
-                      description={errorMessage || "Unknown S3 error"}
+                      description={errorMessage || 'Unknown S3 error'}
                       type="error"
                       showIcon
                       style={{ marginTop: 8 }}
