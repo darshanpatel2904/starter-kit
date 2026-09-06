@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   env: createEnv({
     client: {
       NEXT_PUBLIC_API_URL: z.string().url().default('http://localhost:3001'),

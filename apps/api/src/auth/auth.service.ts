@@ -11,7 +11,6 @@ export function createBetterAuth(
   configService: ConfigService,
   logger?: Logger,
 ): AuthInstance {
-  // Return betterAuth instance cast to AuthInstance to prevent TypeScript portable declaration errors (TS2883)
   return betterAuth({
     database: drizzleAdapter(db, {
       provider: 'pg',
