@@ -1,14 +1,6 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  useSyncExternalStore,
-} from 'react';
-
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ConfigProvider, theme as antdTheme, App as AntdApp, Layout } from 'antd';
 
 type ThemeContextType = {
@@ -16,15 +8,6 @@ type ThemeContextType = {
   mounted: boolean;
   toggleTheme: () => void;
 };
-
-const emptySubscribe = () => () => {};
-function useIsMounted() {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
-}
 
 const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: false,
@@ -34,91 +17,49 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export const useTheme = () => useContext(ThemeContext);
 
-function ThemeBodySync({ children }: { children: React.ReactNode }) {
-  const { token } = antdTheme.useToken();
-  const { isDarkMode } = useTheme();
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = token.colorBgLayout;
-      document.body.style.color = token.colorText;
-      document.documentElement.style.colorScheme = isDarkMode ? 'dark' : 'light';
-
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+    const stored = localStorage.getItem('theme');
+    if (stored) {
+      setIsDarkMode(stored === 'dark');
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setIsDarkMode(true);
     }
-  }, [token.colorBgLayout, token.colorText, isDarkMode]);
-
-  return (
-    <Layout
-      style={{
-        minHeight: '100vh',
-        background: token.colorBgLayout,
-        color: token.colorText,
-        transition: 'background-color 0.3s ease, color 0.3s ease',
-      }}
-    >
-      {children}
-    </Layout>
-  );
-}
-
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const mounted = useIsMounted();
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme) {
-      return storedTheme === 'dark';
-    }
-    return (
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    );
-  });
-
-  const toggleTheme = useCallback(() => {
-    setIsDarkMode((prev) => {
-      const next = !prev;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('theme', next ? 'dark' : 'light');
-      }
-      return next;
-    });
   }, []);
 
-  const currentAlgorithm = isDarkMode ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm;
+  useEffect(() => {
+    if (mounted) {
+      document.documentElement.classList.toggle('dark', isDarkMode);
+      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    }
+  }, [isDarkMode, mounted]);
+
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, mounted, toggleTheme }}>
       <ConfigProvider
         theme={{
-          algorithm: currentAlgorithm,
+          algorithm: isDarkMode ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
           token: {
             colorPrimary: '#1677ff',
             borderRadius: 8,
-            fontFamily:
-              "var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: 'var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif',
           },
           components: {
-            Button: {
-              borderRadius: 6,
-              controlHeight: 40,
-            },
-            Input: {
-              controlHeight: 40,
-            },
-            Card: {
-              borderRadiusLG: 12,
-            },
+            Button: { borderRadius: 6, controlHeight: 40 },
+            Input: { controlHeight: 40 },
+            Card: { borderRadiusLG: 12 },
           },
         }}
       >
         <AntdApp>
-          <ThemeBodySync>{children}</ThemeBodySync>
+          <Layout style={{ minHeight: '100vh', transition: 'all 0.3s ease' }}>{children}</Layout>
         </AntdApp>
       </ConfigProvider>
     </ThemeContext.Provider>
