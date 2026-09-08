@@ -1,3 +1,5 @@
+import type { PaginatedResponse } from './pagination.js';
+
 export interface InitiateUploadResponse {
   fileId: string;
   key: string;
@@ -32,9 +34,4 @@ export interface FileRecord {
   updatedAt: string | Date;
 }
 
-export interface PaginatedFilesResponse {
-  data: FileRecord[];
-  total: number;
-  page: number;
-  limit: number;
-}
+export type PaginatedFilesResponse = PaginatedResponse<FileRecord>;

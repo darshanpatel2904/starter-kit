@@ -2,20 +2,17 @@
 
 import { Layout, Typography, Space } from 'antd';
 import { GithubOutlined, HeartFilled } from '@ant-design/icons';
-import { useTheme } from '../providers/theme-provider';
 
 const { Footer: AntFooter } = Layout;
 const { Text, Link } = Typography;
 
 export function Footer() {
-  const { isDarkMode } = useTheme();
-
   return (
     <AntFooter
       style={{
         textAlign: 'center',
-        background: isDarkMode ? '#141414' : '#fafafa',
-        borderTop: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
+        background: '#141414',
+        borderTop: '1px solid #303030',
         padding: '24px 50px',
       }}
     >

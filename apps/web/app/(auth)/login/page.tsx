@@ -39,6 +39,7 @@ export default function LoginPage() {
         const res = await authClient.signIn.email({
           email: values.email,
           password: values.password,
+          rememberMe: values.remember,
         });
 
         if (res?.error) {

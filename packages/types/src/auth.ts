@@ -10,7 +10,7 @@ export interface SignUpFormValues {
   name: string;
   email: string;
   password: string;
-  confirmPassword?: string;
+  confirmPassword: string;
 }
 
 export interface ForgotPasswordFormValues {
@@ -19,5 +19,5 @@ export interface ForgotPasswordFormValues {
 
 export interface ResetPasswordFormValues {
   newPassword: string;
-  confirmPassword?: string;
+  confirmPassword: string;
 }

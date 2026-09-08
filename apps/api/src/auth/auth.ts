@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -9,7 +9,7 @@ export type AuthInstance = ReturnType<typeof betterAuth>;
 
 export function createBetterAuth(
   configService: ConfigService,
-  logger?: Logger,
+  logger: Logger,
 ): AuthInstance {
   return betterAuth({
     database: drizzleAdapter(db, {
@@ -34,14 +34,4 @@ export function createBetterAuth(
     },
     plugins: [passkey()],
   }) as unknown as AuthInstance;
-}
-
-@Injectable()
-export class AuthService {
-  public readonly auth: AuthInstance;
-  private readonly logger = new Logger(AuthService.name);
-
-  constructor(private readonly configService: ConfigService) {
-    this.auth = createBetterAuth(this.configService, this.logger);
-  }
 }

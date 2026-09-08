@@ -2,10 +2,6 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-html.dark body {
-  background-color: #000000;
+  background-color: #141414;
   color: rgba(255, 255, 255, 0.88);
 }

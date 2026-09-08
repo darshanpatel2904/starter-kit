@@ -134,7 +134,7 @@ export class StorageController {
     description: 'Presigned download URL generated.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 44, description: 'File not found.' })
+  @ApiResponse({ status: 404, description: 'File not found.' })
   async getDownloadUrl(
     @Param('id') fileId: string,
     @Session() session: UserSession,

@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Layout, Button, Avatar, Dropdown, Space, Typography, App as AntdApp } from 'antd';
 import {
-  SunOutlined,
-  MoonOutlined,
   UserOutlined,
   LogoutOutlined,
   SafetyCertificateOutlined,
@@ -15,7 +13,6 @@ import {
   DashboardOutlined,
   CloudUploadOutlined,
 } from '@ant-design/icons';
-import { useTheme } from '../providers/theme-provider';
 import { authClient } from '../lib/auth-client';
 
 const { Header } = Layout;
@@ -26,7 +23,6 @@ export function Navbar() {
   const router = useRouter();
   const { message } = AntdApp.useApp();
   const [, startTransition] = useTransition();
-  const { isDarkMode, mounted, toggleTheme } = useTheme();
   const { data: session, isPending } = authClient.useSession();
 
   const handleSignOut = () => {
@@ -92,8 +88,8 @@ export function Navbar() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 24px',
-        background: isDarkMode ? '#141414' : '#ffffff',
-        borderBottom: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
+        background: '#141414',
+        borderBottom: '1px solid #303030',
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
       }}
     >
@@ -149,18 +145,8 @@ export function Navbar() {
       </Space>
 
       <Space size="middle" align="center">
-        <Button
-          type="text"
-          shape="circle"
-          icon={
-            mounted && isDarkMode ? <SunOutlined style={{ color: '#faad14' }} /> : <MoonOutlined />
-          }
-          onClick={toggleTheme}
-          title={mounted && isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        />
-
         <div>
-          {mounted && !isPending && (
+          {!isPending && (
             <>
               {session?.user ? (
                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>

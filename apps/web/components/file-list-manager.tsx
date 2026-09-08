@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   Card,
@@ -23,6 +23,7 @@ import {
   FileZipOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
+import { useQuery, useMutation, keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import { fetcher } from '../lib/api-client';
 import type { FileRecord, PaginatedFilesResponse } from '@repo/types';
 
@@ -34,56 +35,67 @@ interface FileListManagerProps {
 
 export function FileListManager({ refreshTrigger }: FileListManagerProps) {
   const { message } = AntdApp.useApp();
-  const [files, setFiles] = useState<FileRecord[]>([]);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [total, setTotal] = useState(0);
 
-  const loadFiles = useCallback(
-    async (currentPage = page, currentLimit = limit) => {
-      setLoading(true);
-      try {
-        const data = await fetcher<PaginatedFilesResponse>(
-          `/storage/files?page=${currentPage}&limit=${currentLimit}`,
-        );
-        if (data) {
-          setFiles(data.data || []);
-          setTotal(data.total || 0);
-        }
-      } catch {
-        message.error('Failed to load files list.');
-      } finally {
-        setLoading(false);
+  const { data, isLoading, isFetching, refetch } = useQuery({
+    queryKey: ['files', page, limit, refreshTrigger],
+    queryFn: async () => {
+      const res = await fetcher<PaginatedFilesResponse>(
+        `/storage/files?page=${page}&limit=${limit}`,
+      );
+      if (!res) {
+        throw new Error('Failed to load files list.');
       }
+      return res;
     },
-    [page, limit, message],
-  );
+    placeholderData: keepPreviousData,
+  });
 
-  useEffect(() => {
-    let active = true;
-    fetcher<PaginatedFilesResponse>(`/storage/files?page=${page}&limit=${limit}`)
-      .then((data) => {
-        if (active && data) {
-          setFiles(data.data || []);
-          setTotal(data.total || 0);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          message.error('Failed to load files list.');
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
+  const files = data?.data || [];
+  const total = data?.total || 0;
+
+  const deleteMutation = useMutation({
+    mutationFn: async (fileId: string) => {
+      const res = await fetcher<{ success: boolean }>(`/storage/files/${fileId}`, {
+        method: 'DELETE',
+      });
+      if (!res?.success) {
+        throw new Error('Failed to delete file.');
+      }
+      return res;
+    },
+    onMutate: async (deletedFileId) => {
+      await queryClient.cancelQueries({ queryKey: ['files'] });
+
+      const previousQueries = queryClient.getQueriesData({
+        queryKey: ['files'],
       });
 
-    return () => {
-      active = false;
-    };
-  }, [page, limit, refreshTrigger, message]);
+      queryClient.setQueriesData<PaginatedFilesResponse>({ queryKey: ['files'] }, (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          data: oldData.data.filter((file) => file.id !== deletedFileId),
+          total: Math.max(0, oldData.total - 1),
+        };
+      });
+
+      return { previousQueries };
+    },
+    onError: (_err, _deletedFileId, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, queryData]) => {
+          queryClient.setQueryData(queryKey, queryData);
+        });
+      }
+      message.error('Failed to delete file.');
+    },
+    onSuccess: () => {
+      message.success('File deleted successfully.');
+    },
+  });
 
   const handleDownload = async (fileId: string) => {
     try {
@@ -98,18 +110,8 @@ export function FileListManager({ refreshTrigger }: FileListManagerProps) {
     }
   };
 
-  const handleDelete = async (fileId: string) => {
-    try {
-      const res = await fetcher<{ success: boolean }>(`/storage/files/${fileId}`, {
-        method: 'DELETE',
-      });
-      if (res?.success) {
-        message.success('File deleted successfully.');
-        loadFiles(page, limit);
-      }
-    } catch {
-      message.error('Failed to delete file.');
-    }
+  const handleDelete = (fileId: string) => {
+    deleteMutation.mutate(fileId);
   };
 
   const formatBytes = (bytes: number): string => {
@@ -220,7 +222,11 @@ export function FileListManager({ refreshTrigger }: FileListManagerProps) {
           <Text type="secondary">View and manage your stored files on AWS S3.</Text>
         </div>
 
-        <Button icon={<ReloadOutlined />} onClick={() => loadFiles(page, limit)} loading={loading}>
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={() => refetch()}
+          loading={isLoading || isFetching}
+        >
           Refresh
         </Button>
       </Flex>
@@ -229,7 +235,7 @@ export function FileListManager({ refreshTrigger }: FileListManagerProps) {
         dataSource={files}
         columns={columns}
         rowKey="id"
-        loading={loading}
+        loading={isLoading || isFetching}
         pagination={{
           current: page,
           pageSize: limit,

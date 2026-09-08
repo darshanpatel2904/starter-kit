@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ThemeProvider } from '../providers/theme-provider';
+import { AntdProvider } from '../providers/antd-provider';
 import { Navbar } from '../components/navbar';
 import { Footer } from '../components/footer';
 import './globals.css';
@@ -32,13 +32,13 @@ export default function RootLayout({
         style={{ margin: 0, padding: 0 }}
       >
         <AntdRegistry>
-          <ThemeProvider>
+          <AntdProvider>
             <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
               <Navbar />
               <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</main>
               <Footer />
             </div>
-          </ThemeProvider>
+          </AntdProvider>
         </AntdRegistry>
       </body>
     </html>
