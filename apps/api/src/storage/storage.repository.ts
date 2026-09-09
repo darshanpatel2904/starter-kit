@@ -1,18 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import {
-  db,
-  files,
-  eq,
-  desc,
-  sql,
-  type FileRecord,
-  type NewFileRecord,
-} from '@repo/db';
+import { Injectable, Inject } from '@nestjs/common';
+import { DATABASE_CONNECTION, files, eq, desc, sql } from '@repo/db';
+import type { Database, FileRecord, NewFileRecord } from '@repo/db';
 
 @Injectable()
 export class StorageRepository {
+  constructor(
+    @Inject(DATABASE_CONNECTION)
+    private readonly db: Database,
+  ) {}
+
   async createFileRecord(data: NewFileRecord): Promise<FileRecord> {
-    const [inserted] = await db.insert(files).values(data).returning();
+    const [inserted] = await this.db.insert(files).values(data).returning();
     if (!inserted) {
       throw new Error('Failed to insert file record into database.');
     }
@@ -23,7 +21,7 @@ export class StorageRepository {
     fileId: string,
     status: 'COMPLETED' | 'ABORTED',
   ): Promise<FileRecord | undefined> {
-    const [updated] = await db
+    const [updated] = await this.db
       .update(files)
       .set({ status, updatedAt: new Date() })
       .where(eq(files.id, fileId))
@@ -32,7 +30,7 @@ export class StorageRepository {
   }
 
   async findFileById(fileId: string): Promise<FileRecord | undefined> {
-    const [fileRecord] = await db
+    const [fileRecord] = await this.db
       .select()
       .from(files)
       .where(eq(files.id, fileId));
@@ -50,7 +48,7 @@ export class StorageRepository {
   }> {
     const offset = (pagination.page - 1) * pagination.limit;
 
-    const data = await db
+    const data = await this.db
       .select()
       .from(files)
       .where(eq(files.uploaderId, uploaderId))
@@ -58,7 +56,7 @@ export class StorageRepository {
       .limit(pagination.limit)
       .offset(offset);
 
-    const [countResult] = await db
+    const [countResult] = await this.db
       .select({ count: sql<number>`count(*)` })
       .from(files)
       .where(eq(files.uploaderId, uploaderId));
@@ -74,6 +72,6 @@ export class StorageRepository {
   }
 
   async deleteFileRecord(fileId: string): Promise<void> {
-    await db.delete(files).where(eq(files.id, fileId));
+    await this.db.delete(files).where(eq(files.id, fileId));
   }
 }

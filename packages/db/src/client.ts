@@ -18,6 +18,14 @@ export const getDb = (): PostgresJsDatabase<typeof schema> => {
   return _db;
 };
 
-export const db = new Proxy({} as PostgresJsDatabase<typeof schema>, {
-  get: (_, prop) => getDb()[prop as keyof PostgresJsDatabase<typeof schema>],
+export type Database = PostgresJsDatabase<typeof schema>;
+export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
+
+export const db = new Proxy({} as Database, {
+  get: (_, prop) => getDb()[prop as keyof Database],
 });
+
+export const databaseProvider = {
+  provide: DATABASE_CONNECTION,
+  useValue: db,
+};

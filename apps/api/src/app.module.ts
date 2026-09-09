@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller.js';
-import { DatabaseModule } from './database/database.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DatabaseModule } from './database/database.module.js';
 import { UsersModule } from './users/users.module.js';
 
 import {
@@ -18,6 +18,7 @@ import { StorageModule } from './storage/storage.module.js';
 
 @Module({
   imports: [
+    DatabaseModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
@@ -37,13 +38,11 @@ import { StorageModule } from './storage/storage.module.js';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const short = configService.get<{ ttl: number; limit: number }>(
+        const short = configService.getOrThrow<{ ttl: number; limit: number }>(
           'app.throttler.short',
-          { ttl: 10000, limit: 10 },
         );
-        const medium = configService.get<{ ttl: number; limit: number }>(
+        const medium = configService.getOrThrow<{ ttl: number; limit: number }>(
           'app.throttler.medium',
-          { ttl: 60000, limit: 100 },
         );
         return {
           throttlers: [
@@ -61,7 +60,6 @@ import { StorageModule } from './storage/storage.module.js';
         };
       },
     }),
-    DatabaseModule,
     UsersModule,
     AuthModule,
     StorageModule,

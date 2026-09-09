@@ -33,12 +33,8 @@ async function bootstrap() {
   );
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('app.port', 3001);
-  const appUrl = configService.get<string>(
-    'app.appUrl',
-    'http://localhost:3000',
-  );
-  const corsOrigins = configService.get<string[]>('app.corsOrigins', [appUrl]);
+  const port = configService.getOrThrow<number>('app.port');
+  const corsOrigins = configService.getOrThrow<string[]>('app.corsOrigins');
 
   app.enableCors({
     origin: (
@@ -61,12 +57,14 @@ async function bootstrap() {
       'Authorization',
       'Accept',
       'X-Requested-With',
+      'x-better-auth-csrf',
     ],
     exposedHeaders: [
       'Retry-After',
       'X-RateLimit-Limit',
       'X-RateLimit-Remaining',
       'X-RateLimit-Reset',
+      'set-cookie',
     ],
     credentials: true,
   });

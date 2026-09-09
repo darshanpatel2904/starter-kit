@@ -8,7 +8,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import {
   S3Client,
-  type S3ClientConfig,
   CreateMultipartUploadCommand,
   UploadPartCommand,
   CompleteMultipartUploadCommand,
@@ -54,28 +53,15 @@ export class StorageService {
     const secretAccessKey = this.configService.getOrThrow<string>(
       'storage.secretAccessKey',
     );
-    const endpoint = this.configService.get<string>('storage.endpoint');
-    const forcePathStyle = this.configService.get<boolean>(
-      'storage.forcePathStyle',
-      false,
-    );
-
     this.bucket = this.configService.getOrThrow<string>('storage.bucket');
 
-    const clientConfig: S3ClientConfig = {
+    this.s3Client = new S3Client({
       region,
-      forcePathStyle,
       credentials: {
         accessKeyId,
         secretAccessKey,
       },
-    };
-
-    if (endpoint) {
-      clientConfig.endpoint = endpoint;
-    }
-
-    this.s3Client = new S3Client(clientConfig);
+    });
   }
 
   /**
