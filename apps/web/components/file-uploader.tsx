@@ -111,17 +111,18 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
     <Card
       style={{
         width: '100%',
-        borderRadius: 12,
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+        borderRadius: 20,
+        boxShadow: '0 8px 30px rgba(28, 28, 28, 0.05)',
+        border: '1px solid rgba(28, 28, 28, 0.08)',
       }}
     >
       <Space orientation="vertical" size="large" style={{ width: '100%' }}>
         <div>
-          <Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
-            <CloudUploadOutlined style={{ marginRight: 8, color: '#1677ff' }} />
+          <Title level={4} style={{ marginTop: 0, marginBottom: 4, color: '#1C1C1C' }}>
+            <CloudUploadOutlined style={{ marginRight: 8, color: '#143F3A' }} />
             AWS S3 Multipart File Upload
           </Title>
-          <Text type="secondary">
+          <Text type="secondary" style={{ color: '#4A4A4A' }}>
             Upload files of any size. Files larger than 10MB are automatically processed using S3
             Parallel Multipart Upload chunks.
           </Text>
@@ -135,19 +136,22 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
             return false; // Prevent default form upload
           }}
           style={{
-            padding: '24px',
-            background: 'var(--ant-color-bg-container, #fafafa)',
-            borderRadius: 8,
-            border: '2px dashed #1677ff',
+            padding: '32px 24px',
+            background: '#FAF8F5',
+            borderRadius: 16,
+            border: '2px dashed rgba(20, 63, 58, 0.25)',
           }}
         >
           <p className="ant-upload-drag-icon">
-            <InboxOutlined style={{ fontSize: 48, color: '#1677ff' }} />
+            <InboxOutlined style={{ fontSize: 48, color: '#143F3A' }} />
           </p>
-          <p className="ant-upload-text" style={{ fontSize: 16, fontWeight: 600 }}>
+          <p
+            className="ant-upload-text"
+            style={{ fontSize: 16, fontWeight: 600, color: '#1C1C1C' }}
+          >
             Click or drag file to this area to upload
           </p>
-          <p className="ant-upload-hint" style={{ color: '#8c8c8c' }}>
+          <p className="ant-upload-hint" style={{ color: '#4A4A4A' }}>
             Supports single presigned PUT for files ≤10MB, and 3-worker parallel S3 Multipart upload
             for files &gt;10MB.
           </p>
@@ -155,7 +159,9 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
 
         {activeUploads.length > 0 && (
           <Space orientation="vertical" style={{ width: '100%' }} size="middle">
-            <Text strong>Active Upload Jobs</Text>
+            <Text strong style={{ color: '#1C1C1C' }}>
+              Active Upload Jobs
+            </Text>
             {activeUploads.map((item) => {
               const { jobId, file, status, progress, isMultipart, errorMessage } = item;
 
@@ -164,27 +170,47 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                   key={jobId}
                   size="small"
                   style={{
-                    borderRadius: 8,
-                    border: status === 'error' ? '1px solid #ff4d4f' : undefined,
+                    borderRadius: 12,
+                    border:
+                      status === 'error' ? '1px solid #FCA5A5' : '1px solid rgba(28, 28, 28, 0.08)',
+                    background: '#FFFFFF',
                   }}
                 >
                   <Flex justify="space-between" align="center" style={{ marginBottom: 8 }}>
                     <Space align="center">
-                      <FileOutlined style={{ fontSize: 20, color: '#1677ff' }} />
+                      <FileOutlined style={{ fontSize: 20, color: '#143F3A' }} />
                       <div>
-                        <Text strong style={{ fontSize: 14 }}>
+                        <Text strong style={{ fontSize: 14, color: '#1C1C1C' }}>
                           {file.name}
                         </Text>
                         <div>
-                          <Text type="secondary" style={{ fontSize: 12 }}>
+                          <Text type="secondary" style={{ fontSize: 12, color: '#4A4A4A' }}>
                             {formatBytes(file.size)}
                           </Text>
                           {isMultipart ? (
-                            <Tag color="blue" style={{ marginLeft: 8 }}>
+                            <Tag
+                              style={{
+                                marginLeft: 8,
+                                background: '#E0F2FE',
+                                color: '#0C4A6E',
+                                border: '1px solid #7DD3FC',
+                                fontWeight: 600,
+                                borderRadius: 12,
+                              }}
+                            >
                               S3 Multipart
                             </Tag>
                           ) : (
-                            <Tag color="green" style={{ marginLeft: 8 }}>
+                            <Tag
+                              style={{
+                                marginLeft: 8,
+                                background: '#D1FAE5',
+                                color: '#064E3B',
+                                border: '1px solid #6EE7B7',
+                                fontWeight: 600,
+                                borderRadius: 12,
+                              }}
+                            >
                               Single PUT
                             </Tag>
                           )}
@@ -204,12 +230,32 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                         </Button>
                       )}
                       {status === 'completed' && (
-                        <Tag color="success" icon={<CheckCircleOutlined />}>
+                        <Tag
+                          icon={<CheckCircleOutlined />}
+                          style={{
+                            background: '#D1FAE5',
+                            color: '#064E3B',
+                            border: '1px solid #6EE7B7',
+                            fontWeight: 600,
+                            borderRadius: 12,
+                            padding: '4px 12px',
+                          }}
+                        >
                           Completed
                         </Tag>
                       )}
                       {status === 'error' && (
-                        <Tag color="error" icon={<CloseCircleOutlined />}>
+                        <Tag
+                          icon={<CloseCircleOutlined />}
+                          style={{
+                            background: '#FEE2E2',
+                            color: '#7F1D1D',
+                            border: '1px solid #FCA5A5',
+                            fontWeight: 600,
+                            borderRadius: 12,
+                            padding: '4px 12px',
+                          }}
+                        >
                           Failed
                         </Tag>
                       )}
@@ -222,8 +268,8 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                         percent={progress}
                         status="active"
                         strokeColor={{
-                          '0%': '#108ee9',
-                          '100%': '#87d068',
+                          '0%': '#143F3A',
+                          '100%': '#5FC2AE',
                         }}
                       />
                     </>

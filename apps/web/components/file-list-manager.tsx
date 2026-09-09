@@ -153,16 +153,69 @@ export function FileListManager({ refreshTrigger }: FileListManagerProps) {
       title: 'MIME Type',
       dataIndex: 'mimeType',
       key: 'mimeType',
-      render: (type: string) => <Tag>{type || 'binary'}</Tag>,
+      render: (type: string) => (
+        <Tag
+          style={{
+            background: '#EFE7D8',
+            color: '#1C1C1C',
+            border: '1px solid rgba(28, 28, 28, 0.12)',
+            fontWeight: 600,
+            borderRadius: 12,
+          }}
+        >
+          {type || 'binary'}
+        </Tag>
+      ),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => {
-        if (status === 'COMPLETED') return <Tag color="success">COMPLETED</Tag>;
-        if (status === 'PENDING') return <Tag color="processing">PENDING</Tag>;
-        return <Tag color="error">ABORTED</Tag>;
+        if (status === 'COMPLETED')
+          return (
+            <Tag
+              style={{
+                background: '#D1FAE5',
+                color: '#064E3B',
+                border: '1px solid #6EE7B7',
+                fontWeight: 700,
+                borderRadius: 12,
+                padding: '2px 10px',
+              }}
+            >
+              COMPLETED
+            </Tag>
+          );
+        if (status === 'PENDING')
+          return (
+            <Tag
+              style={{
+                background: '#FEF3C7',
+                color: '#78350F',
+                border: '1px solid #FCD34D',
+                fontWeight: 700,
+                borderRadius: 12,
+                padding: '2px 10px',
+              }}
+            >
+              PENDING
+            </Tag>
+          );
+        return (
+          <Tag
+            style={{
+              background: '#FEE2E2',
+              color: '#7F1D1D',
+              border: '1px solid #FCA5A5',
+              fontWeight: 700,
+              borderRadius: 12,
+              padding: '2px 10px',
+            }}
+          >
+            ABORTED
+          </Tag>
+        );
       },
     },
     {

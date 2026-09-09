@@ -54,11 +54,6 @@ export function Navbar() {
     },
     { type: 'divider' as const },
     {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: <Link href="/profile">Profile Settings</Link>,
-    },
-    {
       key: 'dashboard',
       icon: <DashboardOutlined />,
       label: <Link href="/dashboard">Dashboard</Link>,
@@ -87,10 +82,11 @@ export function Navbar() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 24px',
-        background: '#141414',
-        borderBottom: '1px solid #303030',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        padding: '0 28px',
+        background: 'rgba(245, 242, 237, 0.92)',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(28, 28, 28, 0.08)',
+        boxShadow: '0 4px 20px rgba(28, 28, 28, 0.03)',
       }}
     >
       <Space size="large" align="center">
@@ -102,19 +98,19 @@ export function Navbar() {
             style={{
               width: 36,
               height: 36,
-              borderRadius: 8,
-              background: 'linear-gradient(135deg, #1677ff 0%, #0958d9 100%)',
+              borderRadius: 10,
+              background: 'linear-gradient(135deg, #143F3A 0%, #1C1C1C 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#fff',
+              color: '#F5F2ED',
               fontWeight: 'bold',
               fontSize: 18,
             }}
           >
             <SafetyCertificateOutlined />
           </div>
-          <Text strong style={{ fontSize: 18, letterSpacing: '-0.5px' }}>
+          <Text strong style={{ fontSize: 18, letterSpacing: '-0.5px', color: '#1C1C1C' }}>
             StarterKit Auth
           </Text>
         </Link>
@@ -153,8 +149,7 @@ export function Navbar() {
                   <Avatar
                     src={session.user.image}
                     icon={!session.user.image && <UserOutlined />}
-                    style={{ backgroundColor: '#1677ff', cursor: 'pointer' }}
-                    size="medium"
+                    style={{ backgroundColor: '#143F3A', cursor: 'pointer' }}
                   />
                 </Dropdown>
               ) : (

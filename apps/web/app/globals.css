@@ -2,6 +2,14 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: #141414;
-  color: rgba(255, 255, 255, 0.88);
+  background-color: #F5F2ED;
+  color: #1C1C1C;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: rgba(154, 141, 119, 0.25);
+  color: #1C1C1C;
 }
