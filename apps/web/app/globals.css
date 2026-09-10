@@ -13,3 +13,36 @@ html, body {
   background-color: rgba(154, 141, 119, 0.25);
   color: #1C1C1C;
 }
+
+/* Ant Design Upload Dragger global styles */
+.ant-upload-wrapper .ant-upload-drag {
+  padding: 32px 24px;
+  background: #FAF8F5 !important;
+  border-radius: 16px !important;
+  border: 2px dashed rgba(20, 63, 58, 0.25) !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.ant-upload-wrapper .ant-upload-drag:hover {
+  border-color: #143F3A !important;
+  background: #F5F2ED !important;
+}
+
+.ant-upload-wrapper .ant-upload-drag .ant-upload-drag-icon {
+  margin-bottom: 12px;
+}
+
+.ant-upload-wrapper .ant-upload-drag .ant-upload-drag-icon .anticon {
+  font-size: 48px;
+  color: #143F3A;
+}
+
+.ant-upload-wrapper .ant-upload-drag .ant-upload-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1C1C1C;
+}
+
+.ant-upload-wrapper .ant-upload-drag .ant-upload-hint {
+  color: #4A4A4A;
+}

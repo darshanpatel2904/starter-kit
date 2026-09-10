@@ -1,7 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
-
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Layout, Button, Avatar, Dropdown, Space, Typography, App as AntdApp } from 'antd';
@@ -13,6 +11,7 @@ import {
   DashboardOutlined,
   CloudUploadOutlined,
 } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import { authClient } from '../lib/auth-client';
 
 const { Header } = Layout;
@@ -22,19 +21,23 @@ export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { message } = AntdApp.useApp();
-  const [, startTransition] = useTransition();
   const { data: session, isPending } = authClient.useSession();
 
+  const { mutate: signOut } = useMutation({
+    mutationFn: async () => {
+      await authClient.signOut();
+    },
+    onSuccess: () => {
+      message.success('Logged out successfully');
+      router.push('/login');
+    },
+    onError: () => {
+      message.error('Failed to log out');
+    },
+  });
+
   const handleSignOut = () => {
-    startTransition(async () => {
-      try {
-        await authClient.signOut();
-        message.success('Logged out successfully');
-        router.push('/login');
-      } catch {
-        message.error('Failed to log out');
-      }
-    });
+    signOut();
   };
 
   const userMenuItems = [

@@ -35,3 +35,6 @@ export interface FileRecord {
 }
 
 export type PaginatedFilesResponse = PaginatedResponse<FileRecord>;
+
+export const MULTIPART_THRESHOLD_BYTES = 10 * 1024 * 1024; // 10MB
+export const DEFAULT_CHUNK_SIZE_BYTES = 5 * 1024 * 1024; // 5MB

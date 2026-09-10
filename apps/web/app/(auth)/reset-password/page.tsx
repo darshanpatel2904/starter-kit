@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense, useState, useTransition } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Card, Form, Input, Button, Result, Typography, Skeleton, App as AntdApp } from 'antd';
 import { LockOutlined, KeyOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import type { ResetPasswordFormValues } from '@repo/types';
 import { authClient } from '@/lib/auth-client';
 
@@ -28,34 +29,37 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
   const [form] = Form.useForm<ResetPasswordFormValues>();
-  const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
   const { message } = AntdApp.useApp();
 
-  const onFinish = (values: ResetPasswordFormValues) => {
-    if (!token) {
-      message.error('Reset token is missing or invalid. Please request a new link.');
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const res = await authClient.resetPassword({
-          newPassword: values.newPassword,
-          token,
-        });
-
-        if (res?.error) {
-          message.error(res.error.message || 'Failed to reset password');
-        } else {
-          setIsSuccess(true);
-          message.success('Password reset successfully!');
-        }
-      } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred';
-        message.error(errorMsg);
+  const { mutate: resetPassword, isPending } = useMutation({
+    mutationFn: async (values: ResetPasswordFormValues) => {
+      if (!token) {
+        throw new Error('Reset token is missing or invalid. Please request a new link.');
       }
-    });
+
+      const res = await authClient.resetPassword({
+        newPassword: values.newPassword,
+        token,
+      });
+
+      if (res?.error) {
+        throw new Error(res.error.message || 'Failed to reset password');
+      }
+
+      return res;
+    },
+    onSuccess: () => {
+      setIsSuccess(true);
+      message.success('Password reset successfully!');
+    },
+    onError: (err: Error) => {
+      message.error(err.message || 'An unexpected error occurred');
+    },
+  });
+
+  const onFinish = (values: ResetPasswordFormValues) => {
+    resetPassword(values);
   };
 
   if (isSuccess) {

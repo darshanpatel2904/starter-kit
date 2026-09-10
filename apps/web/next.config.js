@@ -4,12 +4,21 @@ import { z } from 'zod';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  transpilePackages: ['@repo/types'],
+  async rewrites() {
+    return [
+      {
+        source: '/api/auth/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/auth/:path*`,
+      },
+    ];
+  },
   env: createEnv({
     client: {
-      NEXT_PUBLIC_API_URL: z.string().url().default('http://localhost:3001'),
+      NEXT_PUBLIC_API_URL: z.string().url(),
     },
     experimental__runtimeEnv: {
-      NEXT_PUBLIC_API_URL: globalThis.process?.env?.NEXT_PUBLIC_API_URL,
+      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     },
   }),
 };

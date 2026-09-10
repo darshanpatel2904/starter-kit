@@ -1,6 +1,6 @@
-import * as schema from './schema/index.js';
+import * as schema from './schema/index';
 
-export * from './schema/index.js';
-export * from './client.js';
+export * from './schema/index';
+export * from './client';
 export { schema };
 export { eq, and, desc, sql } from 'drizzle-orm';

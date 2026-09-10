@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, Form, Input, Button, Divider, Typography, Space, App as AntdApp } from 'antd';
@@ -12,54 +11,53 @@ import {
   GoogleOutlined,
   GithubOutlined,
 } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import type { SignUpFormValues, SocialProvider } from '@repo/types';
 import { authClient } from '@/lib/auth-client';
+import { useSocialSignIn } from '@/hooks/use-social-sign-in';
 
 const { Title, Text } = Typography;
 
 export default function SignUpPage() {
   const [form] = Form.useForm<SignUpFormValues>();
-  const [isPending, startTransition] = useTransition();
-  const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null);
   const router = useRouter();
   const { message } = AntdApp.useApp();
 
-  const onFinish = (values: SignUpFormValues) => {
-    startTransition(async () => {
-      try {
-        const res = await authClient.signUp.email({
-          name: values.name,
-          email: values.email,
-          password: values.password,
-        });
+  const { mutate: signUp, isPending: isSignUpPending } = useMutation({
+    mutationFn: async (values: SignUpFormValues) => {
+      const res = await authClient.signUp.email({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      });
 
-        if (res?.error) {
-          message.error(res.error.message || 'Sign up failed');
-        } else {
-          message.success('Account created successfully!');
-          router.push('/dashboard');
-        }
-      } catch (err: unknown) {
-        const errorMsg =
-          err instanceof Error ? err.message : 'An unexpected error occurred during registration';
-        message.error(errorMsg);
+      if (res?.error) {
+        throw new Error(res.error.message || 'Sign up failed');
       }
-    });
+
+      return res;
+    },
+    onSuccess: () => {
+      message.success('Account created successfully!');
+      router.push('/dashboard');
+    },
+    onError: (err: Error) => {
+      message.error(err.message || 'An unexpected error occurred during registration');
+    },
+  });
+
+  const {
+    mutate: socialSignIn,
+    isPending: isSocialPending,
+    variables: socialProvider,
+  } = useSocialSignIn('/dashboard');
+
+  const onFinish = (values: SignUpFormValues) => {
+    signUp(values);
   };
 
   const handleSocialSignIn = (provider: SocialProvider) => {
-    setSocialLoading(provider);
-    startTransition(async () => {
-      try {
-        await authClient.signIn.social({
-          provider,
-          callbackURL: '/dashboard',
-        });
-      } catch {
-        message.error(`Failed to sign up with ${provider}`);
-        setSocialLoading(null);
-      }
-    });
+    socialSignIn(provider);
   };
 
   return (
@@ -82,7 +80,7 @@ export default function SignUpPage() {
           block
           size="large"
           icon={<GoogleOutlined />}
-          loading={isPending && socialLoading === 'google'}
+          loading={isSocialPending && socialProvider === 'google'}
           onClick={() => handleSocialSignIn('google')}
         >
           Sign up with Google
@@ -91,7 +89,7 @@ export default function SignUpPage() {
           block
           size="large"
           icon={<GithubOutlined />}
-          loading={isPending && socialLoading === 'github'}
+          loading={isSocialPending && socialProvider === 'github'}
           onClick={() => handleSocialSignIn('github')}
         >
           Sign up with GitHub
@@ -173,7 +171,7 @@ export default function SignUpPage() {
             block
             size="large"
             icon={<UserAddOutlined />}
-            loading={isPending && !socialLoading}
+            loading={isSignUpPending}
           >
             Create Account
           </Button>

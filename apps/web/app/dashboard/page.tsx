@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Typography, Button, Space, Descriptions, Tag, Avatar, App as AntdApp } from 'antd';
 import {
@@ -9,6 +9,7 @@ import {
   SafetyCertificateOutlined,
   DashboardOutlined,
 } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import { authClient } from '@/lib/auth-client';
 
 const { Title, Paragraph, Text } = Typography;
@@ -17,7 +18,19 @@ export default function DashboardPage() {
   const { data: session, isPending: sessionLoading } = authClient.useSession();
   const router = useRouter();
   const { message } = AntdApp.useApp();
-  const [isSigningOut, startSignOutTransition] = useTransition();
+
+  const { mutate: signOut, isPending: isSigningOut } = useMutation({
+    mutationFn: async () => {
+      await authClient.signOut();
+    },
+    onSuccess: () => {
+      message.success('Logged out successfully');
+      router.push('/login');
+    },
+    onError: () => {
+      message.error('Failed to sign out');
+    },
+  });
 
   useEffect(() => {
     if (!sessionLoading && !session?.user) {
@@ -26,15 +39,7 @@ export default function DashboardPage() {
   }, [sessionLoading, session, router]);
 
   const handleSignOut = () => {
-    startSignOutTransition(async () => {
-      try {
-        await authClient.signOut();
-        message.success('Logged out successfully');
-        router.push('/login');
-      } catch {
-        message.error('Failed to sign out');
-      }
-    });
+    signOut();
   };
 
   if (sessionLoading || !session?.user) return null;
@@ -73,17 +78,7 @@ export default function DashboardPage() {
                 <Title level={3} style={{ margin: 0, color: '#1C1C1C' }}>
                   Dashboard
                 </Title>
-                <Tag
-                  style={{
-                    background: '#EFE7D8',
-                    color: '#1C1C1C',
-                    border: '1px solid rgba(28, 28, 28, 0.1)',
-                    borderRadius: 12,
-                  }}
-                  icon={<DashboardOutlined style={{ color: '#143F3A' }} />}
-                >
-                  Protected Area
-                </Tag>
+                <Tag icon={<DashboardOutlined />}>Protected Area</Tag>
               </Space>
               <Paragraph type="secondary" style={{ margin: '4px 0 0', color: '#4A4A4A' }}>
                 Welcome back, <Text strong>{user.name || user.email}</Text>!
@@ -122,16 +117,7 @@ export default function DashboardPage() {
             <Text code>{user.id}</Text>
           </Descriptions.Item>
           <Descriptions.Item label="Account Status">
-            <Tag
-              style={{
-                background: 'rgba(95, 194, 174, 0.15)',
-                color: '#143F3A',
-                border: '1px solid rgba(95, 194, 174, 0.3)',
-                borderRadius: 12,
-              }}
-            >
-              Active Session
-            </Tag>
+            <Tag color="success">Active Session</Tag>
           </Descriptions.Item>
         </Descriptions>
       </Card>

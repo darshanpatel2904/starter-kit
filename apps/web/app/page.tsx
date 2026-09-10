@@ -21,22 +21,7 @@ export default function Home() {
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 20px', width: '100%' }}>
       {/* Hero Section */}
       <div style={{ textAlign: 'center', padding: '40px 0 60px' }}>
-        <Tag
-          style={{
-            padding: '6px 16px',
-            borderRadius: 20,
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: '0.15em',
-            textTransform: 'uppercase',
-            marginBottom: 20,
-            background: 'rgba(20, 63, 58, 0.08)',
-            color: '#143F3A',
-            border: '1px solid rgba(20, 63, 58, 0.2)',
-          }}
-        >
-          Next.js 16 + Ant Design + UI Light Theme
-        </Tag>
+        <Tag style={{ marginBottom: 20 }}>Next.js 16 + Ant Design + UI Light Theme</Tag>
         <Title
           level={1}
           style={{

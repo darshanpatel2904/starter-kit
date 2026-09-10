@@ -10,7 +10,8 @@ import {
   FileOutlined,
 } from '@ant-design/icons';
 import { uploadFileToS3 } from '../lib/s3-uploader';
-import type { FileRecord } from '@repo/types';
+import { formatBytes } from '../lib/formatters';
+import { MULTIPART_THRESHOLD_BYTES, type FileRecord } from '@repo/types';
 
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
@@ -33,17 +34,9 @@ interface ActiveUploadState {
 export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
   const [activeUploads, setActiveUploads] = useState<ActiveUploadState[]>([]);
 
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
   const startUpload = async (file: File) => {
     const jobId = `${file.name}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const isMultipart = file.size > 10 * 1024 * 1024; // > 10MB
+    const isMultipart = file.size > MULTIPART_THRESHOLD_BYTES;
     const controller = new AbortController();
 
     const initialState: ActiveUploadState = {
@@ -135,23 +128,12 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
             startUpload(file as File);
             return false; // Prevent default form upload
           }}
-          style={{
-            padding: '32px 24px',
-            background: '#FAF8F5',
-            borderRadius: 16,
-            border: '2px dashed rgba(20, 63, 58, 0.25)',
-          }}
         >
           <p className="ant-upload-drag-icon">
-            <InboxOutlined style={{ fontSize: 48, color: '#143F3A' }} />
+            <InboxOutlined />
           </p>
-          <p
-            className="ant-upload-text"
-            style={{ fontSize: 16, fontWeight: 600, color: '#1C1C1C' }}
-          >
-            Click or drag file to this area to upload
-          </p>
-          <p className="ant-upload-hint" style={{ color: '#4A4A4A' }}>
+          <p className="ant-upload-text">Click or drag file to this area to upload</p>
+          <p className="ant-upload-hint">
             Supports single presigned PUT for files ≤10MB, and 3-worker parallel S3 Multipart upload
             for files &gt;10MB.
           </p>
@@ -188,29 +170,11 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                             {formatBytes(file.size)}
                           </Text>
                           {isMultipart ? (
-                            <Tag
-                              style={{
-                                marginLeft: 8,
-                                background: '#E0F2FE',
-                                color: '#0C4A6E',
-                                border: '1px solid #7DD3FC',
-                                fontWeight: 600,
-                                borderRadius: 12,
-                              }}
-                            >
+                            <Tag color="info" style={{ marginLeft: 8 }}>
                               S3 Multipart
                             </Tag>
                           ) : (
-                            <Tag
-                              style={{
-                                marginLeft: 8,
-                                background: '#D1FAE5',
-                                color: '#064E3B',
-                                border: '1px solid #6EE7B7',
-                                fontWeight: 600,
-                                borderRadius: 12,
-                              }}
-                            >
+                            <Tag color="success" style={{ marginLeft: 8 }}>
                               Single PUT
                             </Tag>
                           )}
@@ -230,32 +194,12 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                         </Button>
                       )}
                       {status === 'completed' && (
-                        <Tag
-                          icon={<CheckCircleOutlined />}
-                          style={{
-                            background: '#D1FAE5',
-                            color: '#064E3B',
-                            border: '1px solid #6EE7B7',
-                            fontWeight: 600,
-                            borderRadius: 12,
-                            padding: '4px 12px',
-                          }}
-                        >
+                        <Tag color="success" icon={<CheckCircleOutlined />}>
                           Completed
                         </Tag>
                       )}
                       {status === 'error' && (
-                        <Tag
-                          icon={<CloseCircleOutlined />}
-                          style={{
-                            background: '#FEE2E2',
-                            color: '#7F1D1D',
-                            border: '1px solid #FCA5A5',
-                            fontWeight: 600,
-                            borderRadius: 12,
-                            padding: '4px 12px',
-                          }}
-                        >
+                        <Tag color="error" icon={<CloseCircleOutlined />}>
                           Failed
                         </Tag>
                       )}

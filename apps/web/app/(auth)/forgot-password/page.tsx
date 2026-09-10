@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Card, Form, Input, Button, Result, Typography, App as AntdApp } from 'antd';
 import { MailOutlined, ArrowLeftOutlined, SendOutlined } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import type { ForgotPasswordFormValues } from '@repo/types';
 import { authClient } from '@/lib/auth-client';
 
@@ -11,29 +12,33 @@ const { Title, Text } = Typography;
 
 export default function ForgotPasswordPage() {
   const [form] = Form.useForm<ForgotPasswordFormValues>();
-  const [isPending, startTransition] = useTransition();
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const { message } = AntdApp.useApp();
 
-  const onFinish = (values: ForgotPasswordFormValues) => {
-    startTransition(async () => {
-      try {
-        const res = await authClient.requestPasswordReset({
-          email: values.email,
-          redirectTo: '/reset-password',
-        });
+  const { mutate: requestPasswordReset, isPending } = useMutation({
+    mutationFn: async (values: ForgotPasswordFormValues) => {
+      const res = await authClient.requestPasswordReset({
+        email: values.email,
+        redirectTo: '/reset-password',
+      });
 
-        if (res?.error) {
-          message.error(res.error.message || 'Failed to send reset email');
-        } else {
-          setSubmittedEmail(values.email);
-          message.success('Password reset email sent!');
-        }
-      } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred';
-        message.error(errorMsg);
+      if (res?.error) {
+        throw new Error(res.error.message || 'Failed to send reset email');
       }
-    });
+
+      return values.email;
+    },
+    onSuccess: (email) => {
+      setSubmittedEmail(email);
+      message.success('Password reset email sent!');
+    },
+    onError: (err: Error) => {
+      message.error(err.message || 'An unexpected error occurred');
+    },
+  });
+
+  const onFinish = (values: ForgotPasswordFormValues) => {
+    requestPasswordReset(values);
   };
 
   const handleResetEmail = () => {

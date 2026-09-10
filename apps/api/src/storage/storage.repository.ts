@@ -1,11 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { DATABASE_CONNECTION, files, eq, desc, sql } from '@repo/db';
+import { DATABASE, files, eq, desc, sql } from '@repo/db';
 import type { Database, FileRecord, NewFileRecord } from '@repo/db';
 
 @Injectable()
 export class StorageRepository {
   constructor(
-    @Inject(DATABASE_CONNECTION)
+    @Inject(DATABASE)
     private readonly db: Database,
   ) {}
 

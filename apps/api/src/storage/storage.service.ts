@@ -27,14 +27,13 @@ import type {
   AbortUploadDto,
   ListFilesQueryDto,
 } from './dto/index.js';
-import type {
-  InitiateUploadResponse,
-  PresignPartResponse,
-  PaginatedFilesResponse,
+import {
+  MULTIPART_THRESHOLD_BYTES,
+  DEFAULT_CHUNK_SIZE_BYTES,
+  type InitiateUploadResponse,
+  type PresignPartResponse,
+  type PaginatedFilesResponse,
 } from '@repo/types';
-
-const MULTIPART_THRESHOLD = 10 * 1024 * 1024; // 10MB
-const DEFAULT_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
 @Injectable()
 export class StorageService {
@@ -74,7 +73,7 @@ export class StorageService {
     const fileId = randomUUID();
     const sanitizedFileName = dto.fileName.replace(/[^a-zA-Z0-9_.-]/g, '_');
     const key = `uploads/${uploaderId}/${fileId}/${sanitizedFileName}`;
-    const isMultipart = dto.fileSize > MULTIPART_THRESHOLD;
+    const isMultipart = dto.fileSize > MULTIPART_THRESHOLD_BYTES;
 
     if (!isMultipart) {
       // Single Presigned PUT URL
@@ -133,7 +132,7 @@ export class StorageService {
       uploaderId,
     });
 
-    const chunkSize = DEFAULT_CHUNK_SIZE;
+    const chunkSize = DEFAULT_CHUNK_SIZE_BYTES;
     const totalParts = Math.ceil(dto.fileSize / chunkSize);
 
     return {

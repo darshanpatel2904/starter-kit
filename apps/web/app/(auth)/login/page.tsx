@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -21,53 +20,53 @@ import {
   GithubOutlined,
   LoginOutlined,
 } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import type { LoginFormValues, SocialProvider } from '@repo/types';
 import { authClient } from '@/lib/auth-client';
+import { useSocialSignIn } from '@/hooks/use-social-sign-in';
 
 const { Title, Text } = Typography;
 
 export default function LoginPage() {
   const [form] = Form.useForm<LoginFormValues>();
-  const [isPending, startTransition] = useTransition();
-  const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null);
   const router = useRouter();
   const { message } = AntdApp.useApp();
 
-  const onFinish = (values: LoginFormValues) => {
-    startTransition(async () => {
-      try {
-        const res = await authClient.signIn.email({
-          email: values.email,
-          password: values.password,
-          rememberMe: values.remember,
-        });
+  const { mutate: login, isPending: isLoginPending } = useMutation({
+    mutationFn: async (values: LoginFormValues) => {
+      const res = await authClient.signIn.email({
+        email: values.email,
+        password: values.password,
+        rememberMe: values.remember,
+      });
 
-        if (res?.error) {
-          message.error(res.error.message || 'Invalid email or password');
-        } else {
-          message.success('Logged in successfully!');
-          router.push('/dashboard');
-        }
-      } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred';
-        message.error(errorMsg);
+      if (res?.error) {
+        throw new Error(res.error.message || 'Invalid email or password');
       }
-    });
+
+      return res;
+    },
+    onSuccess: () => {
+      message.success('Logged in successfully!');
+      router.push('/dashboard');
+    },
+    onError: (err: Error) => {
+      message.error(err.message || 'An unexpected error occurred');
+    },
+  });
+
+  const {
+    mutate: socialSignIn,
+    isPending: isSocialPending,
+    variables: socialProvider,
+  } = useSocialSignIn('/dashboard');
+
+  const onFinish = (values: LoginFormValues) => {
+    login(values);
   };
 
   const handleSocialSignIn = (provider: SocialProvider) => {
-    setSocialLoading(provider);
-    startTransition(async () => {
-      try {
-        await authClient.signIn.social({
-          provider,
-          callbackURL: '/dashboard',
-        });
-      } catch {
-        message.error(`Failed to sign in with ${provider}`);
-        setSocialLoading(null);
-      }
-    });
+    socialSignIn(provider);
   };
 
   return (
@@ -90,7 +89,7 @@ export default function LoginPage() {
           block
           size="large"
           icon={<GoogleOutlined />}
-          loading={isPending && socialLoading === 'google'}
+          loading={isSocialPending && socialProvider === 'google'}
           onClick={() => handleSocialSignIn('google')}
         >
           Continue with Google
@@ -99,7 +98,7 @@ export default function LoginPage() {
           block
           size="large"
           icon={<GithubOutlined />}
-          loading={isPending && socialLoading === 'github'}
+          loading={isSocialPending && socialProvider === 'github'}
           onClick={() => handleSocialSignIn('github')}
         >
           Continue with GitHub
@@ -157,7 +156,7 @@ export default function LoginPage() {
             block
             size="large"
             icon={<LoginOutlined />}
-            loading={isPending && !socialLoading}
+            loading={isLoginPending}
           >
             Sign In
           </Button>

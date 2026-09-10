@@ -153,6 +153,7 @@ export function AntdProvider({ children }: { children: React.ReactNode }) {
             },
             Upload: {
               colorBgContainer: '#FAF8F5',
+              colorFillAlter: '#FAF8F5',
               colorBorder: 'rgba(20, 63, 58, 0.25)',
               colorPrimaryHover: '#143F3A',
               colorText: '#1C1C1C',

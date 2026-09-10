@@ -1,9 +1,10 @@
 import { fetcher } from './api-client';
-import type {
-  InitiateUploadResponse,
-  PresignPartResponse,
-  CompletedPart,
-  FileRecord,
+import {
+  DEFAULT_CHUNK_SIZE_BYTES,
+  type InitiateUploadResponse,
+  type PresignPartResponse,
+  type CompletedPart,
+  type FileRecord,
 } from '@repo/types';
 
 export interface CustomUploadOptions {
@@ -97,7 +98,7 @@ export async function uploadFileToS3(options: CustomUploadOptions): Promise<File
       isMultipart,
       uploadId,
       uploadUrl,
-      chunkSize = 5 * 1024 * 1024,
+      chunkSize = DEFAULT_CHUNK_SIZE_BYTES,
       totalParts = 1,
     } = initiateRes;
 

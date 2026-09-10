@@ -25,6 +25,7 @@ import {
 } from '@ant-design/icons';
 import { useQuery, useMutation, keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import { fetcher } from '../lib/api-client';
+import { formatBytes } from '../lib/formatters';
 import type { FileRecord, PaginatedFilesResponse } from '@repo/types';
 
 const { Title, Text } = Typography;
@@ -56,7 +57,11 @@ export function FileListManager({ refreshTrigger }: FileListManagerProps) {
   const files = data?.data || [];
   const total = data?.total || 0;
 
-  const deleteMutation = useMutation({
+  const {
+    mutate: deleteFile,
+    isPending: isDeleting,
+    variables: deletingId,
+  } = useMutation({
     mutationFn: async (fileId: string) => {
       const res = await fetcher<{ success: boolean }>(`/storage/files/${fileId}`, {
         method: 'DELETE',
@@ -97,30 +102,25 @@ export function FileListManager({ refreshTrigger }: FileListManagerProps) {
     },
   });
 
-  const handleDownload = async (fileId: string) => {
-    try {
+  const {
+    mutate: downloadFile,
+    isPending: isDownloading,
+    variables: downloadingId,
+  } = useMutation({
+    mutationFn: async (fileId: string) => {
       const res = await fetcher<{ downloadUrl: string }>(`/storage/files/${fileId}/download`);
-      if (res?.downloadUrl) {
-        window.open(res.downloadUrl, '_blank');
-      } else {
-        message.error('Failed to generate download URL.');
+      if (!res?.downloadUrl) {
+        throw new Error('Failed to generate download URL.');
       }
-    } catch {
-      message.error('Download failed.');
-    }
-  };
-
-  const handleDelete = (fileId: string) => {
-    deleteMutation.mutate(fileId);
-  };
-
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+      return res.downloadUrl;
+    },
+    onSuccess: (downloadUrl) => {
+      window.open(downloadUrl, '_blank');
+    },
+    onError: (err: Error) => {
+      message.error(err.message || 'Download failed.');
+    },
+  });
 
   const getFileIcon = (mimeType: string) => {
     if (mimeType.includes('pdf')) return <FilePdfOutlined style={{ color: '#ff4d4f' }} />;
@@ -153,69 +153,16 @@ export function FileListManager({ refreshTrigger }: FileListManagerProps) {
       title: 'MIME Type',
       dataIndex: 'mimeType',
       key: 'mimeType',
-      render: (type: string) => (
-        <Tag
-          style={{
-            background: '#EFE7D8',
-            color: '#1C1C1C',
-            border: '1px solid rgba(28, 28, 28, 0.12)',
-            fontWeight: 600,
-            borderRadius: 12,
-          }}
-        >
-          {type || 'binary'}
-        </Tag>
-      ),
+      render: (type: string) => <Tag>{type || 'binary'}</Tag>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => {
-        if (status === 'COMPLETED')
-          return (
-            <Tag
-              style={{
-                background: '#D1FAE5',
-                color: '#064E3B',
-                border: '1px solid #6EE7B7',
-                fontWeight: 700,
-                borderRadius: 12,
-                padding: '2px 10px',
-              }}
-            >
-              COMPLETED
-            </Tag>
-          );
-        if (status === 'PENDING')
-          return (
-            <Tag
-              style={{
-                background: '#FEF3C7',
-                color: '#78350F',
-                border: '1px solid #FCD34D',
-                fontWeight: 700,
-                borderRadius: 12,
-                padding: '2px 10px',
-              }}
-            >
-              PENDING
-            </Tag>
-          );
-        return (
-          <Tag
-            style={{
-              background: '#FEE2E2',
-              color: '#7F1D1D',
-              border: '1px solid #FCA5A5',
-              fontWeight: 700,
-              borderRadius: 12,
-              padding: '2px 10px',
-            }}
-          >
-            ABORTED
-          </Tag>
-        );
+        if (status === 'COMPLETED') return <Tag color="success">COMPLETED</Tag>;
+        if (status === 'PENDING') return <Tag color="warning">PENDING</Tag>;
+        return <Tag color="error">ABORTED</Tag>;
       },
     },
     {
@@ -227,34 +174,46 @@ export function FileListManager({ refreshTrigger }: FileListManagerProps) {
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: unknown, record: FileRecord) => (
-        <Space>
-          <Tooltip title="Download via Presigned S3 URL">
-            <Button
-              type="primary"
-              ghost
-              size="small"
-              icon={<DownloadOutlined />}
-              onClick={() => handleDownload(record.id)}
-              disabled={record.status !== 'COMPLETED'}
-            >
-              Download
-            </Button>
-          </Tooltip>
+      render: (_: unknown, record: FileRecord) => {
+        const isThisDeleting = isDeleting && deletingId === record.id;
+        const isThisDownloading = isDownloading && downloadingId === record.id;
 
-          <Popconfirm
-            title="Delete file"
-            description="Are you sure you want to delete this file from S3?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="text" danger size="small" icon={<DeleteOutlined />}>
-              Delete
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
+        return (
+          <Space>
+            <Tooltip title="Download via Presigned S3 URL">
+              <Button
+                type="primary"
+                ghost
+                size="small"
+                icon={<DownloadOutlined />}
+                onClick={() => downloadFile(record.id)}
+                loading={isThisDownloading}
+                disabled={record.status !== 'COMPLETED'}
+              >
+                Download
+              </Button>
+            </Tooltip>
+
+            <Popconfirm
+              title="Delete file"
+              description="Are you sure you want to delete this file from S3?"
+              onConfirm={() => deleteFile(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                type="text"
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
+                loading={isThisDeleting}
+              >
+                Delete
+              </Button>
+            </Popconfirm>
+          </Space>
+        );
+      },
     },
   ];
 
