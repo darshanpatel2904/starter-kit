@@ -15,7 +15,7 @@ const nextConfig = {
   },
   env: createEnv({
     client: {
-      NEXT_PUBLIC_API_URL: z.string().url(),
+      NEXT_PUBLIC_API_URL: z.string().url().default('http://localhost:3001'),
     },
     experimental__runtimeEnv: {
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
